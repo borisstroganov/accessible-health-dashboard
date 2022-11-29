@@ -1,32 +1,50 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { ImDroplet } from 'react-icons/im'
+import { FaHeartbeat } from 'react-icons/fa'
+import { BsSoundwave } from 'react-icons/bs'
 import './App.css'
 
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [heartRate, setHeartRate] = useState(null);
+  const [bloodPressure, setBloodPressure] = useState(null);
+  const [speechRate, setSpeechRate] = useState(null);
+  const [pageState, setPageState] = useState("home");
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="navbar">
+        <div className="dashboard-title">
+          <h3 onClick={() => setPageState("home")}>Home</h3>
+        </div>
+        <ul>
+          <li>
+            <a onClick={() => setPageState("hr")}>HR <FaHeartbeat /></a>
+          </li>
+          <li>
+            <a onClick={() => setPageState("bp")}>BP <ImDroplet /></a>
+          </li>
+          <li>
+            <a onClick={() => setPageState("speech")}>Speech <BsSoundwave /></a>
+          </li>
+        </ul>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <h1>Accessible Health Dashboard</h1>
+      <h2>Current State: {pageState}</h2>
+      <div className="dashboard">
+        <div className="dashboard-card">
+          <h2>Heart Rate <FaHeartbeat /></h2>
+          <h3>{heartRate ? heartRate : "-"} BPM</h3>
+        </div>
+        <div className="dashboard-card">
+          <h2>Blood Pressure <ImDroplet /></h2>
+          <h3>{bloodPressure ? bloodPressure : "-"} mmHg</h3>
+        </div>
+        <div className="dashboard-card">
+          <h2>Speech Rate <BsSoundwave /></h2>
+          <h3>{speechRate ? speechRate : "-"} WPM</h3>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   )
 }
