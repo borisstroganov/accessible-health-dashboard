@@ -29,7 +29,7 @@ function App() {
     return (
         <div className="App">
             <Navbar onClick={handleClick} />
-            {pageState === "home" ? <HomeTab heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
+            {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                 : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                     : pageState === "bp" ? <BpTab onClick={handleBpSubmit}/>
                         : <SpeechTab />}
