@@ -9,8 +9,8 @@ import './App.css'
 
 function App() {
     const [heartRate, setHeartRate] = useState(0);
-    const [bloodPressure, setBloodPressure] = useState(null);
-    const [speechRate, setSpeechRate] = useState(null);
+    const [bloodPressure, setBloodPressure] = useState("");
+    const [speechRate, setSpeechRate] = useState(0);
     const [pageState, setPageState] = useState("home");
     let handleClick = (state: string) => {
         setPageState(state)
@@ -21,12 +21,17 @@ function App() {
         setPageState("home");
     }
 
+    let handleBpSubmit = (bp: string) => {
+        setBloodPressure(bp);
+        setPageState("home");
+    }
+
     return (
         <div className="App">
             <Navbar onClick={handleClick} />
             {pageState === "home" ? <HomeTab heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                 : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
-                    : pageState === "bp" ? <BpTab />
+                    : pageState === "bp" ? <BpTab onClick={handleBpSubmit}/>
                         : <SpeechTab />}
 
         </div>

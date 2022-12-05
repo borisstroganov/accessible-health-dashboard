@@ -2,7 +2,7 @@ import NumberInput from './NumberInput'
 import './HrTab.css'
 
 type HrTabProps = {
-    onClick: (bp: number) => void;
+    onClick: (hr: number) => void;
 }
 
 function HrTab({ onClick }: HrTabProps) {
