@@ -1,0 +1,21 @@
+.speech-tab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.speech-text-wrapper {
+    max-width: 800px;
+    border: 2px solid;
+    border-radius: 10% / 20%;
+}
+
+.title {
+    margin: 0;
+}
+
+.speech-text {
+    font-size: 120%;
+    padding: 10px;
+}
