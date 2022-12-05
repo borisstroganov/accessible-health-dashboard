@@ -8,19 +8,24 @@ import './App.css'
 
 
 function App() {
-    const [heartRate, setHeartRate] = useState(null);
+    const [heartRate, setHeartRate] = useState(0);
     const [bloodPressure, setBloodPressure] = useState(null);
     const [speechRate, setSpeechRate] = useState(null);
     const [pageState, setPageState] = useState("home");
-    const handleClick = (state: string) => {
+    let handleClick = (state: string) => {
         setPageState(state)
+    }
+
+    let handleHrSubmit = (hr: number) => {
+        setHeartRate(hr);
+        setPageState("home");
     }
 
     return (
         <div className="App">
             <Navbar onClick={handleClick} />
             {pageState === "home" ? <HomeTab heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
-                : pageState === "hr" ? <HrTab />
+                : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                     : pageState === "bp" ? <BpTab />
                         : <SpeechTab />}
 

@@ -29,10 +29,6 @@
     padding: .25rem;
 }
 
-.navbar a:hover {
-    color: white;
-}
-
 .navbar li {
     background-color: #777;
 }

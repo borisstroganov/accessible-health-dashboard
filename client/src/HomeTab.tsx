@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ImDroplet } from 'react-icons/im'
 import { FaHeartbeat } from 'react-icons/fa'
 import { BsSoundwave } from 'react-icons/bs'
