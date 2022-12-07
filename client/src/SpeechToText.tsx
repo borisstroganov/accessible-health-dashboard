@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './SpeechToText.css'
 
 type SpeechToTextProps = {
@@ -6,44 +6,58 @@ type SpeechToTextProps = {
     onSubmit: (wpm: number) => void;
 }
 
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition
+const recognition = new SpeechRecognition();
+recognition.continuos = true;
+recognition.interimResults = true;
+recognition.lang = 'en-UK';
+
 function SpeechToText({ onClick, onSubmit }: SpeechToTextProps) {
     const [isListening, setIsListening] = useState(false);
-    const [transcription, setTranscription] = useState('');
-    const [fullText, setFullText] = useState('')
     const [startTime, setStartTime] = useState(0)
     const [time, setTime] = useState(0)
+    const [speech, setSpeech] = useState("")
+    var fullSpeech = ""
+    var currentSpeech = ""
 
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = new SpeechRecognition();
-    recognition.continuos = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-UK';
-
-    recognition.addEventListener('audioend', () => {
-        console.log('Audio capturing ended');
-    });
-
+    useEffect(() => {
+        handleListen()
+    }, [isListening])
 
     const handleListen = () => {
-        setIsListening(true);
-        setStartTime(performance.now())
+        !startTime ? setStartTime(performance.now()) : ""
+
+        if (isListening) {
+            recognition.start()
+            recognition.onend = () => {
+                fullSpeech += currentSpeech
+                recognition.start()
+            }
+        } else {
+            recognition.stop()
+            recognition.onend = () => { }
+            setStartTime(0)
+        }
 
         recognition.onresult = (event: { results: { transcript: any; }[][]; }) => {
-            const transcript = event.results[0][0].transcript;
-            onClick(transcript);
-            setTranscription(transcript)
+            const script = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('')
+
+            onClick(fullSpeech + " " + script)
+            setSpeech(fullSpeech + " " + script)
+            currentSpeech = script
+            recognition.onerror = (event: { error: any; }) => {
+                console.log(event.error)
+            }
         }
-        recognition.onend = () => {
-            recognition.start();
-        }
-        recognition.start();
+
     }
 
     const stopListen = () => {
         setIsListening(false);
-        recognition.stop();
-        recognition.onend = () => { };
         let elapsedTime = performance.now() - startTime;
         setTime(elapsedTime / 1000 / 60);
     }
@@ -54,11 +68,11 @@ function SpeechToText({ onClick, onSubmit }: SpeechToTextProps) {
                 Stop
             </button>
         ) : (
-            <button className="stt-button" onClick={handleListen}>
+            <button className="stt-button" onClick={() => setIsListening(true)}>
                 Record
             </button>
         )}
-        <button className="stt-button" onClick={() => { onSubmit(transcription.split(" ").length / time) }} disabled={!time}>
+        <button className="stt-button" onClick={() => { onSubmit(speech.split(" ").length / time) }} disabled={!time}>
             Submit
         </button>
     </div>
