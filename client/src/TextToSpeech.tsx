@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GiSpeaker, GiPauseButton, GiPlayButton } from "react-icons/gi"
+import { GiSpeaker, GiPauseButton, GiPlayButton, GiCancel } from "react-icons/gi"
 import "./TextToSpeech.css";
 
 type TextToSpeechProps = {
@@ -17,6 +17,7 @@ function TextToSpeech({ text }: TextToSpeechProps) {
     const msg = new SpeechSynthesisUtterance()
     const speech = (msg: SpeechSynthesisUtterance) => {
         msg.text = text;
+        window.speechSynthesis.speaking ? setResume(false) : ""
         window.speechSynthesis.speaking ? window.speechSynthesis.cancel()
             : window.speechSynthesis.speak(msg)
         setPlaying(!playing);
@@ -27,10 +28,10 @@ function TextToSpeech({ text }: TextToSpeechProps) {
         setResume(!resume);
     }
 
-    return (<>
-        <button className="tts-button" onClick={() => speech(msg)}><GiSpeaker /></button>
+    return (<div>
+        <button className="tts-button" onClick={() => speech(msg)}>{playing ? <GiCancel /> : <GiSpeaker />}</button>
         <button className="tts-button" onClick={pause} disabled={!playing}>{resume ? <GiPlayButton /> : <GiPauseButton />}</button>
-    </>
+    </div>
     )
 }
 export default TextToSpeech;

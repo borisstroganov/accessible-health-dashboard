@@ -26,13 +26,18 @@ function App() {
         setPageState("home");
     }
 
+    let handleSpeechSubmit = (wpm: number) => {
+        setSpeechRate(wpm);
+        setPageState("home");
+    }
+
     return (
         <div className="App">
             <Navbar onClick={handleClick} />
             {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                 : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
-                    : pageState === "bp" ? <BpTab onClick={handleBpSubmit}/>
-                        : <SpeechTab />}
+                    : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
+                        : <SpeechTab onSubmit={handleSpeechSubmit} />}
 
         </div>
     )

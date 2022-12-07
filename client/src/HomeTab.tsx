@@ -26,7 +26,7 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("speech")}>
                     <h2>Speech Rate <BsSoundwave /></h2>
-                    <h3>{speechRate ? speechRate : "-"} WPM</h3>
+                    <h3>{speechRate ? Math.round(speechRate) : "-"} WPM</h3>
                 </div>
             </div>
         </div>
