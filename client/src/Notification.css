@@ -1,0 +1,32 @@
+.notification-wrapper {
+    position: absolute;
+    top: 10%;
+    left: 33%;
+}
+
+.notification {
+    display:inline-block;
+    justify-content: center;
+    align-items: start;
+    padding: 1rem 1rem;
+    background-color: #4287f5;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.notification-title h3 {
+    margin: 0;
+}
+
+.notification-text h5 {
+    margin: 0;
+}
+
+.notification-button {
+    position: absolute;
+    top: 15%;
+    right: 3%;
+    padding: 1px 3px;
+    background-color: lightgrey;
+    opacity: 0.8;
+}

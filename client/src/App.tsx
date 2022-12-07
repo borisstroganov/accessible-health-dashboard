@@ -12,6 +12,7 @@ function App() {
     const [bloodPressure, setBloodPressure] = useState("");
     const [speechRate, setSpeechRate] = useState(0);
     const [pageState, setPageState] = useState("home");
+
     let handleClick = (state: string) => {
         setPageState(state)
     }
