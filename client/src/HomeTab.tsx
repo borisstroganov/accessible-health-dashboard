@@ -7,9 +7,9 @@ import './HomeTab.css'
 
 type HomeTabProps = {
     onClick: (state: string) => void;
-    heartRate: number | null;
-    bloodPressure: string | null;
-    speechRate: number | null;
+    heartRate: {hr: number; date: Date | undefined};
+    bloodPressure: {bp: string; date: Date | undefined};
+    speechRate: {wpm: number; date: Date | undefined};
 }
 
 function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps) {
@@ -20,7 +20,7 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
     }, [heartRate, bloodPressure, speechRate])
 
     let handleNotification = () => {
-        setNotification(!heartRate || !bloodPressure || !speechRate);
+        setNotification(!heartRate.hr || !bloodPressure.bp || !speechRate.wpm);
     }
 
     return (
@@ -30,15 +30,18 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
             <div className="dashboard">
                 <div className="dashboard-card" onClick={() => onClick("hr")}>
                     <h2>Heart Rate <FaHeartbeat /></h2>
-                    <h3>{heartRate ? heartRate : "-"} BPM</h3>
+                    <h3>{heartRate.hr ? heartRate.hr : "-"} BPM</h3>
+                    <h3>{heartRate.date ? heartRate.date.toDateString() : "-- / -- / --"}</h3>
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("bp")}>
                     <h2>Blood Pressure <ImDroplet /></h2>
-                    <h3>{bloodPressure ? bloodPressure : "-"} mmHg</h3>
+                    <h3>{bloodPressure.bp ? bloodPressure.bp : "-"} mmHg</h3>
+                    <h3>{bloodPressure.date ? bloodPressure.date.toDateString() : "-- / -- / --"}</h3>
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("speech")}>
                     <h2>Speech Rate <BsSoundwave /></h2>
-                    <h3>{speechRate ? Math.round(speechRate) : "-"} WPM</h3>
+                    <h3>{speechRate.wpm ? Math.round(speechRate.wpm) : "-"} WPM</h3>
+                    <h3>{speechRate.date ? speechRate.date.toDateString() : "-- / -- / --"}</h3>
                 </div>
             </div>
         </div>

@@ -8,9 +8,18 @@ import './App.css'
 
 
 function App() {
-    const [heartRate, setHeartRate] = useState(0);
-    const [bloodPressure, setBloodPressure] = useState("");
-    const [speechRate, setSpeechRate] = useState(0);
+    const [heartRate, setHeartRate] = useState<{hr: number; date: Date | undefined}>({
+        hr: 0,
+        date: undefined,
+      });
+    const [bloodPressure, setBloodPressure] = useState<{bp: string; date: Date | undefined}>({
+        bp: "",
+        date: undefined,
+      });
+    const [speechRate, setSpeechRate] = useState<{wpm: number; date: Date | undefined}>({
+        wpm: 0,
+        date: undefined,
+      });
     const [pageState, setPageState] = useState("home");
 
     let handleClick = (state: string) => {
@@ -18,17 +27,17 @@ function App() {
     }
 
     let handleHrSubmit = (hr: number) => {
-        setHeartRate(hr);
+        setHeartRate({hr: hr, date: new Date});
         setPageState("home");
     }
 
     let handleBpSubmit = (bp: string) => {
-        setBloodPressure(bp);
+        setBloodPressure({bp: bp, date: new Date});
         setPageState("home");
     }
 
     let handleSpeechSubmit = (wpm: number) => {
-        setSpeechRate(wpm);
+        setSpeechRate({wpm: wpm, date: new Date});
         setPageState("home");
     }
 
