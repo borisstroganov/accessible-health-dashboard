@@ -1,11 +1,11 @@
-.Login {
+.SignUp {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.login-card {
+.sign-up-card {
     background-color: #5A5A5A;
     border-radius: 20px;
     height: 100%;
@@ -14,7 +14,7 @@
     padding: 10px;
 }
 
-.login-input-container {
+.sign-up-input-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,7 +27,7 @@ label {
     align-self: start;
 }
 
-.login-input {
+.sign-up-input {
     width: 80%;
     display: flex;
     flex-direction: column;
@@ -39,13 +39,14 @@ input {
     border-radius: 5px;
 }
 
+input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
     outline: none;
     box-shadow: inset -1px -1px 3px rgba(255, 255, 255, 0.3);
 }
 
-.login-button {
+.sign-up-button {
     width: 40%;
     max-width: 100px;
     margin-top: 5px;

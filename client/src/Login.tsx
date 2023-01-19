@@ -3,9 +3,10 @@ import './Login.css'
 
 type LoginProps = {
     onClick: (email: string, password: string) => void;
+    onSignUpClick: () => void;
 }
 
-function Login({ onClick }: LoginProps) {
+function Login({ onClick, onSignUpClick }: LoginProps) {
     const [emailValue, setEmailValue] = useState("");
     const [passwordValue, setPasswordValue] = useState("");
 
@@ -25,7 +26,7 @@ function Login({ onClick }: LoginProps) {
                     <button className="login-button" onClick={() => onClick(emailValue, passwordValue)}>Login</button>
                 </div>
                 <div className="login-sign-up">
-                    Don't have an account yet? <a href="#" className="">Sign-Up</a>
+                    Don't have an account yet? <a href="#" className="" onClick={onSignUpClick}>Sign-Up</a>
                 </div>
             </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Login from './Login'
+import SignUp from './SignUp'
 import Navbar from './Navbar'
 import HomeTab from './HomeTab'
 import HrTab from './HrTab'
@@ -10,6 +11,7 @@ import './App.css'
 
 function App() {
     const [loggedIn, setLoggedIn] = useState<boolean>(false)
+    const [signUp, setSignUp] = useState<boolean>(false)
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: Date | undefined }>({
         hr: 0,
@@ -25,9 +27,18 @@ function App() {
     });
     const [pageState, setPageState] = useState("home");
 
-    let handleLogin = (email: string, password:string) => {
+    let handleLogin = (email: string, password: string) => {
         console.log("Login", email, password);
         setLoggedIn(true);
+    }
+
+    let handleSignUpClick = () => {
+        setSignUp(true);
+    }
+
+    let handleSignUp = (email: string, name: string, password: string) => {
+        console.log("Sign Up", email, name, password);
+        setSignUp(false);
     }
 
     let handleClick = (state: string) => {
@@ -60,7 +71,8 @@ function App() {
                                 : <SpeechTab onSubmit={handleSpeechSubmit} />}
 
                 </div>
-                : <Login onClick={handleLogin} />}
+                : signUp ? <SignUp onClick={handleSignUp} />
+                    : <Login onClick={handleLogin} onSignUpClick={handleSignUpClick} />}
         </>
     )
 }
