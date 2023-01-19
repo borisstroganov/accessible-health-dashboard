@@ -1,0 +1,51 @@
+.Login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background-color: #5A5A5A;
+    border-radius: 20px;
+    height: 100%;
+    width: 20vw;
+    min-width: 280px;
+    padding: 10px;
+}
+
+.login-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    margin-bottom: 40px;
+}
+
+label {
+    align-self: start;
+}
+
+.login-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+input {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    box-shadow: inset -1px -1px 3px rgba(255, 255, 255, 0.3);
+}
+
+.login-button {
+    width: 40%;
+    max-width: 100px;
+    margin-top: 5px;
+}
