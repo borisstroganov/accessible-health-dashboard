@@ -3,9 +3,18 @@ import bodyParser from "body-parser";
 import Database from "better-sqlite3";
 import { v4 as uuidv4 } from 'uuid';
 import fs from "fs";
+import cors from "cors";
+import Ajv, { JSONSchemaType } from "ajv";
+import addFormats from "ajv-formats";
+
+import { SignUpRequest, SignUpResponse, ServerError } from "../../common/types";
+
+const ajv = new Ajv();
+addFormats(ajv, ["email", "password"]);
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 const db = new Database("./src/db/data.db", { verbose: console.log });
 db.pragma("foreign_keys = ON");
@@ -25,36 +34,75 @@ function createTables(): void {
     exec(schema, []);
 }
 
-function createUser(name: string, age: number): void {
+function createUser(email: string, name: string, password: string): void {
     exec(`
-        INSERT INTO user (id, name, age)
-        VALUES (?, ?, ?);
-    `, [uuidv4(), name, age]);
+        INSERT INTO user (id, email, name, password)
+        VALUES (?, ?, ?, ?);
+    `, [uuidv4(), email, name, password]);
 }
 
-function listUsers(age: number): Array<string> {
-    const users = query<{id: string, name: string, age: number}>(`
+function loginUser(email: string, password: string): boolean {
+    const user = query<{ id: string, email: string, name: string, password: string }>(`
         SELECT *
         FROM user
-        WHERE age > ?;
-    `, [age]);
+        WHERE email = ? AND password = ?;
+    `, [email, password]);
+
+    return user.length > 0;
+}
+
+function listUsers(email: string): Array<string> {
+    const users = query<{ id: string, email: string, name: string, password: string }>(`
+        SELECT *
+        FROM user
+        WHERE email = ?;
+    `, [email]);
     return users.map(user => user.name);
 }
 
 app.post("/signup", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<SignUpRequest> = {
+        type: "object",
+        properties: {
+            email: { type: "string", format: "email" },
+            name: { type: "string" },
+            password: { type: "string", format: "password" },
+        },
+        required: ["email", "name", "password"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { email, name, password } = req.body as SignUpRequest;
+
+    createUser(email, name, password);
+    res.json({
+        email: email,
+        name: name
+    } as SignUpResponse)
+});
+
+app.post("/login", (req: Request, res: Response) => {
     const {
-        name,
-        age
+        email,
+        password,
     } = req.body;
-    createUser(name, parseInt(age));
-    res.send("created: " + name);
+    res.send(loginUser(email, password));
 });
 
 app.get("/list", (req: Request, res: Response) => {
     const {
-        age
+        email
     } = req.query;
-    const users = listUsers(parseInt(age as string));
+    const users = listUsers(email as string);
     res.json(users);
 });
 

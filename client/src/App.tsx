@@ -8,10 +8,11 @@ import BpTab from './BpTab'
 import SpeechTab from './SpeechTab'
 import './App.css'
 
+import { signUp } from './services/signUp'
 
 function App() {
     const [loggedIn, setLoggedIn] = useState<boolean>(false)
-    const [signUp, setSignUp] = useState<boolean>(false)
+    const [signedUp, setSignedUp] = useState<boolean>(false)
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: Date | undefined }>({
         hr: 0,
@@ -33,12 +34,18 @@ function App() {
     }
 
     let handleSignUpClick = () => {
-        setSignUp(true);
+        setSignedUp(true);
     }
 
-    let handleSignUp = (email: string, name: string, password: string) => {
-        console.log("Sign Up", email, name, password);
-        setSignUp(false);
+    let handleSignUp = async (email: string, name: string, password: string) => {
+        const response = await signUp(email, name, password);
+        if (!response) {
+            // handle error
+            return;
+        } else {
+            setSignedUp(false);
+        }
+        console.log(response);
     }
 
     let handleClick = (state: string) => {
@@ -71,7 +78,7 @@ function App() {
                                 : <SpeechTab onSubmit={handleSpeechSubmit} />}
 
                 </div>
-                : signUp ? <SignUp onClick={handleSignUp} />
+                : signedUp ? <SignUp onClick={handleSignUp} />
                     : <Login onClick={handleLogin} onSignUpClick={handleSignUpClick} />}
         </>
     )
