@@ -3,9 +3,10 @@ import './SignUp.css'
 
 type SignUpProps = {
     onClick: (email: string, name: string, password: string) => void;
+    onBackClick: () => void;
 }
 
-function SignUp({ onClick }: SignUpProps) {
+function SignUp({ onClick, onBackClick }: SignUpProps) {
     const [emailValue, setEmailValue] = useState("");
     const [nameValue, setNameValue] = useState("");
     const [passwordValue, setPasswordValue] = useState("");
@@ -28,6 +29,7 @@ function SignUp({ onClick }: SignUpProps) {
                     </div>
 
                     <button className="sign-up-button" onClick={() => onClick(emailValue, nameValue, passwordValue)}>Register</button>
+                    <button className="sign-up-back-button" onClick={onBackClick}>Back</button>
                 </div>
             </div>
         </div>

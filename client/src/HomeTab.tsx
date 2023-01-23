@@ -25,7 +25,7 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
 
     return (
         <div className="home-tab">
-            {notification && <Notification onClick={() => setNotification(false)} title="Missing Data" text="You haven't yet captured all the data, please capture the missing data." />}
+            {notification && <Notification onClick={() => setNotification(false)} title="Missing Data" text="You haven't yet captured all the data, please capture the missing data." color="#4287f5" />}
             <h1>Accessible Health Dashboard</h1>
             <div className="dashboard">
                 <div className="dashboard-card" onClick={() => onClick("hr")}>

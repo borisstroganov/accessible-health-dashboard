@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Login from './Login'
 import SignUp from './SignUp'
 import Navbar from './Navbar'
+import Notification from './Notification'
 import HomeTab from './HomeTab'
 import HrTab from './HrTab'
 import BpTab from './BpTab'
@@ -13,6 +14,9 @@ import { signUp } from './services/signUp'
 function App() {
     const [loggedIn, setLoggedIn] = useState<boolean>(false)
     const [signedUp, setSignedUp] = useState<boolean>(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
+    const [user, setUser] = useState()
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: Date | undefined }>({
         hr: 0,
@@ -33,19 +37,21 @@ function App() {
         setLoggedIn(true);
     }
 
-    let handleSignUpClick = () => {
-        setSignedUp(true);
-    }
-
     let handleSignUp = async (email: string, name: string, password: string) => {
         const response = await signUp(email, name, password);
-        if (!response) {
-            // handle error
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
             return;
         } else {
-            setSignedUp(false);
+            handleBackClick()
         }
         console.log(response);
+    }
+
+    let handleBackClick = () => {
+        setErrorMessage("")
+        setSignedUp(false);
     }
 
     let handleClick = (state: string) => {
@@ -69,6 +75,7 @@ function App() {
 
     return (
         <>
+            {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input" text={"One or more fields are invalid."} color="grey" />}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} />
@@ -78,8 +85,8 @@ function App() {
                                 : <SpeechTab onSubmit={handleSpeechSubmit} />}
 
                 </div>
-                : signedUp ? <SignUp onClick={handleSignUp} />
-                    : <Login onClick={handleLogin} onSignUpClick={handleSignUpClick} />}
+                : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
+                    : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}
         </>
     )
 }

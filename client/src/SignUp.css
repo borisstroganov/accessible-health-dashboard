@@ -51,3 +51,10 @@ input[type="password"]:focus {
     max-width: 100px;
     margin-top: 5px;
 }
+
+.sign-up-back-button {
+    width: 30%;
+    max-width: 100px;
+    position: absolute;
+    bottom: 10vh;
+}

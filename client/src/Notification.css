@@ -1,7 +1,11 @@
 .notification-wrapper {
     position: absolute;
     top: 10%;
-    left: 33%;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
 }
 
 .notification {
@@ -9,7 +13,6 @@
     justify-content: center;
     align-items: start;
     padding: 1rem 1rem;
-    background-color: #4287f5;
     border-radius: 10px;
     margin: 10px;
 }
@@ -24,8 +27,7 @@
 
 .notification-button {
     position: absolute;
-    top: 15%;
-    right: 3%;
+    transform: translate(-37px, 15px);
     padding: 1px 3px;
     background-color: lightgrey;
     opacity: 0.8;

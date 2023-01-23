@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from "fs";
 import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
-import addFormats from "ajv-formats";
+import addFormats from "ajv-formats";
 
-import { SignUpRequest, SignUpResponse, ServerError } from "../../common/types";
+import { SignUpRequest, SignUpResponse } from "../../common/types";
 
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
@@ -65,8 +65,8 @@ app.post("/signup", (req: Request, res: Response) => {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
-            name: { type: "string" },
-            password: { type: "string", format: "password" },
+            name: { type: "string", minLength: 5 },
+            password: { type: "string", pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" },
         },
         required: ["email", "name", "password"],
         additionalProperties: false
@@ -82,6 +82,18 @@ app.post("/signup", (req: Request, res: Response) => {
     }
 
     const { email, name, password } = req.body as SignUpRequest;
+
+    const user = query<{ id: string, email: string, name: string, password: string }>(`
+        SELECT *
+        FROM user
+        WHERE email = ?;
+    `, [email]);
+
+    if (user.length > 0) {
+        return res.status(400).json({
+            message: "Account with this email already exists."
+        })
+    }
 
     createUser(email, name, password);
     res.json({

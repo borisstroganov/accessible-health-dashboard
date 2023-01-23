@@ -5,11 +5,12 @@ type NotificationProps = {
     onClick: () => void;
     title: string;
     text: string;
+    color: string;
 }
 
-function Notification({ onClick, title, text }: NotificationProps) {
+function Notification({ onClick, title, text, color }: NotificationProps) {
     return (<div className="notification-wrapper">
-        <div className="notification">
+        <div className="notification" style={{backgroundColor: color}}>
             <div className="notification-title">
                 <h3>{title}</h3>
             </div>
