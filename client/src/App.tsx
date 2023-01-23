@@ -10,13 +10,19 @@ import SpeechTab from './SpeechTab'
 import './App.css'
 
 import { signUp } from './services/signUp'
+import { login } from './services/login'
+
+type User = {
+    name: string | null;
+    email: string | null;
+};
 
 function App() {
     const [loggedIn, setLoggedIn] = useState<boolean>(false)
     const [signedUp, setSignedUp] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState("")
 
-    const [user, setUser] = useState()
+    const [user, setUser] = useState<User>()
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: Date | undefined }>({
         hr: 0,
@@ -32,9 +38,19 @@ function App() {
     });
     const [pageState, setPageState] = useState("home");
 
-    let handleLogin = (email: string, password: string) => {
-        console.log("Login", email, password);
-        setLoggedIn(true);
+    let handleLogin = async (email: string, password: string) => {
+        const response = await login(email, password);
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setErrorMessage("")
+            setLoggedIn(true);
+            setUser({ email: response.email, name: response.name })
+        }
+        console.log(response);
     }
 
     let handleSignUp = async (email: string, name: string, password: string) => {
@@ -58,6 +74,11 @@ function App() {
         setPageState(state)
     }
 
+    let handleLogOut = () => {
+        setUser({ email: null, name: null })
+        setLoggedIn(false);
+    }
+
     let handleHrSubmit = (hr: number) => {
         setHeartRate({ hr: hr, date: new Date });
         setPageState("home");
@@ -78,7 +99,7 @@ function App() {
             {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input" text={"One or more fields are invalid."} color="grey" />}
             {loggedIn ?
                 <div className="App">
-                    <Navbar onClick={handleClick} />
+                    <Navbar onClick={handleClick} onLogOut={handleLogOut} name={user?.name || ""}/>
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                         : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                             : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />

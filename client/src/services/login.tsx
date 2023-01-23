@@ -1,18 +1,17 @@
 import axios from 'axios';
 import constants from '../static/static.json'
-import { SignUpResponse, ServerError } from "../../../common/types";
+import { LoginResponse, ServerError } from "../../../common/types";
 
-export const signUp = async (email: string, name: string, password: string): Promise<SignUpResponse | ServerError> => {
+export const login = async (email: string, password: string): Promise<LoginResponse | ServerError> => {
     const response = await axios({
         method: 'post',
-        url: constants.URL + "/signup",
+        url: constants.URL + "/login",
         data: {
             email: email,
-            name: name,
             password: password
         }
     })
-        .then(r => r.data as SignUpResponse)
+        .then(r => r.data as LoginResponse)
         .catch((error) => {
             if (error.response) {
                 return error.response.data as ServerError;

@@ -5,13 +5,15 @@ import './Navbar.css'
 
 type NavbarProps = {
     onClick: (state: string) => void;
+    onLogOut: () => void;
+    name: string;
 }
 
-function Navbar({ onClick }: NavbarProps) {
+function Navbar({ onClick, onLogOut, name }: NavbarProps) {
     return (
         <div className="navbar">
             <div className="dashboard-title">
-                <h3 onClick={() => onClick("home")}>Home</h3>
+                <h3 onClick={() => onClick("home")}>Hello {name}!</h3>
             </div>
             <ul>
                 <li>
@@ -22,6 +24,9 @@ function Navbar({ onClick }: NavbarProps) {
                 </li>
                 <li>
                     <a onClick={() => onClick("speech")}>Speech <BsSoundwave /></a>
+                </li>
+                <li>
+                    <a onClick={onLogOut}>Log Out</a>
                 </li>
             </ul>
         </div>

@@ -7,7 +7,7 @@ import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 
-import { SignUpRequest, SignUpResponse } from "../../common/types";
+import { SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, User } from "../../common/types";
 
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
@@ -103,11 +103,40 @@ app.post("/signup", (req: Request, res: Response) => {
 });
 
 app.post("/login", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<LoginRequest> = {
+        type: "object",
+        properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string" },
+        },
+        required: ["email", "password"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
     const {
         email,
         password,
-    } = req.body;
-    res.send(loginUser(email, password));
+    } = req.body as LoginRequest;
+    if (loginUser(email, password)) {
+        const user = query<User>(`
+            SELECT name
+            FROM user
+            WHERE email = ?;
+        `, [email]);
+
+        res.json({
+            email: email,
+            name: user[0].name
+        } as LoginResponse)
+    };
 });
 
 app.get("/list", (req: Request, res: Response) => {
