@@ -11,6 +11,10 @@ import './App.css'
 
 import { signUp } from './services/signUp'
 import { login } from './services/login'
+import { captureBp } from './services/captureBp'
+import { captureHr } from './services/captureHr'
+import { captureSpeech } from './services/captureSpeech'
+
 
 type User = {
     name: string | null;
@@ -24,17 +28,19 @@ function App() {
 
     const [user, setUser] = useState<User>()
 
-    const [heartRate, setHeartRate] = useState<{ hr: number; date: Date | undefined }>({
+    const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({
         hr: 0,
-        date: undefined,
+        date: "",
     });
-    const [bloodPressure, setBloodPressure] = useState<{ bp: string; date: Date | undefined }>({
-        bp: "",
-        date: undefined,
+    const [bloodPressure, setBloodPressure] = useState<{ systolicPressure: number; diastolicPressure: number; date: string }>({
+        systolicPressure: 0,
+        diastolicPressure: 0,
+        date: "",
     });
-    const [speechRate, setSpeechRate] = useState<{ wpm: number; date: Date | undefined }>({
+    const [speechRate, setSpeechRate] = useState<{ wpm: number; accuracy: number; date: string }>({
         wpm: 0,
-        date: undefined,
+        accuracy: 0,
+        date: "",
     });
     const [pageState, setPageState] = useState("home");
 
@@ -79,18 +85,39 @@ function App() {
         setLoggedIn(false);
     }
 
-    let handleHrSubmit = (hr: number) => {
-        setHeartRate({ hr: hr, date: new Date });
+    let handleHrSubmit = async (hr: number) => {
+        const response = await captureHr(user?.email || "", hr);
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setHeartRate({ hr: response.hr, date: response.date });
+        }
         setPageState("home");
     }
 
-    let handleBpSubmit = (bp: string) => {
-        setBloodPressure({ bp: bp, date: new Date });
+    let handleBpSubmit = async (systolicPressure: number, diastolicPressure: number) => {
+        const response = await captureBp(user?.email || "", systolicPressure, diastolicPressure);
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setBloodPressure({ systolicPressure: response.systolicPressure, diastolicPressure: response.diastolicPressure, date: response.date });
+        }
         setPageState("home");
     }
 
-    let handleSpeechSubmit = (wpm: number) => {
-        setSpeechRate({ wpm: wpm, date: new Date });
+    let handleSpeechSubmit = async (wpm: number, accuracy: number) => {
+        const response = await captureSpeech(user?.email || "", wpm, accuracy);
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
+        }
         setPageState("home");
     }
 
@@ -99,7 +126,7 @@ function App() {
             {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input" text={"One or more fields are invalid."} color="grey" />}
             {loggedIn ?
                 <div className="App">
-                    <Navbar onClick={handleClick} onLogOut={handleLogOut} name={user?.name || ""}/>
+                    <Navbar onClick={handleClick} onLogOut={handleLogOut} name={user?.name || ""} />
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                         : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                             : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />

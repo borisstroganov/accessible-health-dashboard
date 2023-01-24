@@ -4,7 +4,7 @@ import SpeechToText from './SpeechToText'
 import './SpeechTab.css'
 
 type SpeechTabProps = {
-    onSubmit: (wpm: number) => void;
+    onSubmit: (wpm: number, accuracy: number) => void;
 }
 
 function SpeechTab({ onSubmit }: SpeechTabProps) {

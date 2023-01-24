@@ -3,7 +3,7 @@ import './SpeechToText.css'
 
 type SpeechToTextProps = {
     onClick: (transcription: string) => void;
-    onSubmit: (wpm: number) => void;
+    onSubmit: (wpm: number, accuracy: number) => void;
 }
 
 const SpeechRecognition =
@@ -72,7 +72,7 @@ function SpeechToText({ onClick, onSubmit }: SpeechToTextProps) {
                 Record
             </button>
         )}
-        <button className="stt-button" onClick={() => { onSubmit(speech.split(" ").length / time) }} disabled={!time}>
+        <button className="stt-button" onClick={() => { onSubmit(speech.split(" ").length / time, 85) }} disabled={!time}>
             Submit
         </button>
     </div>

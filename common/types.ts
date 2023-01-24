@@ -30,38 +30,38 @@ export type User = {
     password: string
 }
 
-export type captureHrResponse = {
+export type CaptureHrResponse = {
     email: string,
     hr: number,
     date: string,
 }
 
-export type captureHrRequest = {
+export type CaptureHrRequest = {
     email: string,
     hr: number,
 }
 
-export type captureBpResponse = {
+export type CaptureBpResponse = {
     email: string,
     systolicPressure: number,
     diastolicPressure: number,
     date: string,
 }
 
-export type captureBpRequest = {
+export type CaptureBpRequest = {
     email: string,
     systolicPressure: number,
     diastolicPressure: number,
 }
 
-export type captureSpeechResponse = {
+export type CaptureSpeechResponse = {
     email: string,
     wpm: number,
     accuracy: number,
     date: string,
 }
 
-export type captureSpeechRequest = {
+export type CaptureSpeechRequest = {
     email: string,
     wpm: number,
     accuracy: number,

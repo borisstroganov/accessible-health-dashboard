@@ -7,7 +7,7 @@ import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 
-import { SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, captureHrRequest, captureHrResponse, captureBpRequest, captureBpResponse, captureSpeechResponse, captureSpeechRequest, User } from "../../common/types";
+import { SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest, CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, User } from "../../common/types";
 
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
@@ -171,7 +171,7 @@ app.post("/login", (req: Request, res: Response) => {
 });
 
 app.post("/captureHr", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<captureHrRequest> = {
+    const schema: JSONSchemaType<CaptureHrRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -192,17 +192,17 @@ app.post("/captureHr", (req: Request, res: Response) => {
     const {
         email,
         hr,
-    } = req.body as captureHrRequest;
+    } = req.body as CaptureHrRequest;
     let date = captureUserHr(email, hr);
     res.json({
         email: email,
         hr: hr,
         date: date
-    } as captureHrResponse)
+    } as CaptureHrResponse)
 });
 
 app.post("/captureBp", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<captureBpRequest> = {
+    const schema: JSONSchemaType<CaptureBpRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -225,18 +225,18 @@ app.post("/captureBp", (req: Request, res: Response) => {
         email,
         systolicPressure,
         diastolicPressure,
-    } = req.body as captureBpRequest;
+    } = req.body as CaptureBpRequest;
     let date = captureUserBp(email, systolicPressure, diastolicPressure);
     res.json({
         email: email,
         systolicPressure: systolicPressure,
         diastolicPressure: diastolicPressure,
         date: date
-    } as captureBpResponse)
+    } as CaptureBpResponse)
 });
 
 app.post("/captureSpeech", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<captureSpeechRequest> = {
+    const schema: JSONSchemaType<CaptureSpeechRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -259,14 +259,14 @@ app.post("/captureSpeech", (req: Request, res: Response) => {
         email,
         wpm,
         accuracy,
-    } = req.body as captureSpeechRequest;
+    } = req.body as CaptureSpeechRequest;
     let date = captureUserSpeech(email, wpm, accuracy);
     res.json({
         email: email,
         wpm: wpm,
         accuracy: accuracy,
         date: date
-    } as captureSpeechResponse)
+    } as CaptureSpeechResponse)
 });
 
 app.get("/list", (req: Request, res: Response) => {
