@@ -29,3 +29,40 @@ export type User = {
     name: string,
     password: string
 }
+
+export type captureHrResponse = {
+    email: string,
+    hr: number,
+    date: string,
+}
+
+export type captureHrRequest = {
+    email: string,
+    hr: number,
+}
+
+export type captureBpResponse = {
+    email: string,
+    systolicPressure: number,
+    diastolicPressure: number,
+    date: string,
+}
+
+export type captureBpRequest = {
+    email: string,
+    systolicPressure: number,
+    diastolicPressure: number,
+}
+
+export type captureSpeechResponse = {
+    email: string,
+    wpm: number,
+    accuracy: number,
+    date: string,
+}
+
+export type captureSpeechRequest = {
+    email: string,
+    wpm: number,
+    accuracy: number,
+}
