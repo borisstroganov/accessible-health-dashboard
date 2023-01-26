@@ -58,3 +58,8 @@ input[type="password"]:focus {
     position: absolute;
     bottom: 10vh;
 }
+
+.regex {
+    font-size: 80%;
+    text-align: left;
+}
