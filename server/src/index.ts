@@ -87,6 +87,39 @@ function listUsers(email: string): Array<string> {
     return users.map(user => user.name);
 }
 
+function retrieveBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string } {
+    const bps = query<{ systolicPressure: number; diastolicPressure: number; date: string }>(`
+        SELECT systolicPressure, diastolicPressure, date
+        FROM bloodPressure
+        WHERE userEmail = ?
+        ORDER BY date DESC 
+        LIMIT 1;
+    `, [email]);
+    return bps[0];
+}
+
+function retrieveHr(email: string): { hr: number; date: string } {
+    const hrs = query<{ hr: number; date: string }>(`
+        SELECT hr, date
+        FROM heartRate
+        WHERE userEmail = ?
+        ORDER BY date DESC 
+        LIMIT 1;
+    `, [email]);
+    return hrs[0];
+}
+
+function retrieveSpeech(email: string): { hr: number; date: string } {
+    const speeches = query<{ hr: number; date: string }>(`
+        SELECT wpm, accuracy, date
+        FROM speechRate
+        WHERE userEmail = ?
+        ORDER BY date DESC 
+        LIMIT 1;
+    `, [email]);
+    return speeches[0];
+}
+
 app.post("/signup", (req: Request, res: Response) => {
     const schema: JSONSchemaType<SignUpRequest> = {
         type: "object",
@@ -267,6 +300,30 @@ app.post("/captureSpeech", (req: Request, res: Response) => {
         accuracy: accuracy,
         date: date
     } as CaptureSpeechResponse)
+});
+
+app.get("/latestBp", (req: Request, res: Response) => {
+    const {
+        email
+    } = req.query;
+    const bp = retrieveBp(email as string);
+    res.json(bp);
+});
+
+app.get("/latestHr", (req: Request, res: Response) => {
+    const {
+        email
+    } = req.query;
+    const hr = retrieveHr(email as string);
+    res.json(hr);
+});
+
+app.get("/latestSpeech", (req: Request, res: Response) => {
+    const {
+        email
+    } = req.query;
+    const speech = retrieveSpeech(email as string);
+    res.json(speech);
 });
 
 app.get("/list", (req: Request, res: Response) => {

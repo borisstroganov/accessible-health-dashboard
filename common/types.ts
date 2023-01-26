@@ -66,3 +66,23 @@ export type CaptureSpeechRequest = {
     wpm: number,
     accuracy: number,
 }
+
+export type LatestBpResponse = {
+    email: string,
+    systolicPressure: number,
+    diastolicPressure: number,
+    date: string,
+}
+
+export type LatestHrResponse = {
+    email: string,
+    hr: number,
+    date: string,
+}
+
+export type LatestSpeechResponse = {
+    email: string,
+    wpm: number,
+    accuracy: number,
+    date: string,
+}

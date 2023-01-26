@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Login from './Login'
 import SignUp from './SignUp'
 import Navbar from './Navbar'
@@ -14,6 +14,9 @@ import { login } from './services/login'
 import { captureBp } from './services/captureBp'
 import { captureHr } from './services/captureHr'
 import { captureSpeech } from './services/captureSpeech'
+import { latestBp } from './services/latestBp'
+import { latestHr } from './services/latestHr'
+import { latestSpeech } from './services/latestSpeech'
 
 
 type User = {
@@ -43,6 +46,51 @@ function App() {
         date: "",
     });
     const [pageState, setPageState] = useState("home");
+
+    useEffect(() => {
+        retrieveBp(user?.email || "")
+        retrieveHr(user?.email || "")
+        retrieveSpeech(user?.email || "")
+    }, [user])
+
+    let retrieveBp = async (email: string) => {
+        let response  = await latestBp(email);
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setBloodPressure(response)
+        }
+        console.log(response);
+    }
+
+    let retrieveHr = async (email: string) => {
+        let response  = await latestHr(email);
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setHeartRate(response)
+        }
+        console.log(response);
+    }
+
+    let retrieveSpeech = async (email: string) => {
+        let response  = await latestSpeech(email);
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSpeechRate(response)
+        }
+        console.log(response);
+    }
 
     let handleLogin = async (email: string, password: string) => {
         const response = await login(email, password);
