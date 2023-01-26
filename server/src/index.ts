@@ -307,7 +307,15 @@ app.get("/latestBp", (req: Request, res: Response) => {
         email
     } = req.query;
     const bp = retrieveBp(email as string);
-    res.json(bp);
+    if (bp) {
+        res.json(bp);
+    } else {
+        res.json({
+            systolicPressure: 0,
+            diastolicPressure: 0,
+            date: ""
+        });
+    }
 });
 
 app.get("/latestHr", (req: Request, res: Response) => {
@@ -315,7 +323,14 @@ app.get("/latestHr", (req: Request, res: Response) => {
         email
     } = req.query;
     const hr = retrieveHr(email as string);
-    res.json(hr);
+    if (hr) {
+        res.json(hr);
+    } else {
+        res.json({
+            hr: 0,
+            date: ""
+        });
+    }
 });
 
 app.get("/latestSpeech", (req: Request, res: Response) => {
@@ -323,7 +338,15 @@ app.get("/latestSpeech", (req: Request, res: Response) => {
         email
     } = req.query;
     const speech = retrieveSpeech(email as string);
-    res.json(speech);
+    if (speech) {
+        res.json(speech);
+    } else {
+        res.json({
+            wpm: 0,
+            accuracy: 0,
+            date: ""
+        });
+    }
 });
 
 app.get("/list", (req: Request, res: Response) => {

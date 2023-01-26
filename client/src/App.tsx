@@ -54,7 +54,7 @@ function App() {
     }, [user])
 
     let retrieveBp = async (email: string) => {
-        let response  = await latestBp(email);
+        let response = await latestBp(email);
 
         if ('message' in response) {
             console.log(response);
@@ -63,11 +63,10 @@ function App() {
         } else {
             setBloodPressure(response)
         }
-        console.log(response);
     }
 
     let retrieveHr = async (email: string) => {
-        let response  = await latestHr(email);
+        let response = await latestHr(email);
 
         if ('message' in response) {
             console.log(response);
@@ -76,11 +75,10 @@ function App() {
         } else {
             setHeartRate(response)
         }
-        console.log(response);
     }
 
     let retrieveSpeech = async (email: string) => {
-        let response  = await latestSpeech(email);
+        let response = await latestSpeech(email);
 
         if ('message' in response) {
             console.log(response);
@@ -89,7 +87,6 @@ function App() {
         } else {
             setSpeechRate(response)
         }
-        console.log(response);
     }
 
     let handleLogin = async (email: string, password: string) => {
@@ -130,6 +127,20 @@ function App() {
 
     let handleLogOut = () => {
         setUser({ email: null, name: null })
+        setBloodPressure({
+            systolicPressure: 0,
+            diastolicPressure: 0,
+            date: "",
+        });
+        setHeartRate({
+            hr: 0,
+            date: "",
+        });
+        setSpeechRate({
+            wpm: 0,
+            accuracy: 0,
+            date: "",
+        });
         setLoggedIn(false);
     }
 
