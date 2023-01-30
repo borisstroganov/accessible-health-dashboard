@@ -7,6 +7,7 @@ import HomeTab from './HomeTab'
 import HrTab from './HrTab'
 import BpTab from './BpTab'
 import SpeechTab from './SpeechTab'
+import Modal from './Modal'
 import './App.css'
 
 import { signUp } from './services/signUp'
@@ -25,9 +26,10 @@ type User = {
 };
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState<boolean>(false)
-    const [signedUp, setSignedUp] = useState<boolean>(false)
-    const [errorMessage, setErrorMessage] = useState("")
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const [signedUp, setSignedUp] = useState<boolean>(false);
+    const [toggleModal, setToggleModal] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState<User>()
 
@@ -142,6 +144,7 @@ function App() {
             date: "",
         });
         setLoggedIn(false);
+        setToggleModal(false);
     }
 
     let handleHrSubmit = async (hr: number) => {
@@ -185,7 +188,8 @@ function App() {
             {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input" text={"One or more fields are invalid."} color="grey" />}
             {loggedIn ?
                 <div className="App">
-                    <Navbar onClick={handleClick} onLogOut={handleLogOut} name={user?.name || ""} />
+                    <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
+                    {toggleModal && <Modal onClick={handleLogOut} onCancel={() => setToggleModal(false)} headerText="Logout" bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
                         : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                             : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
