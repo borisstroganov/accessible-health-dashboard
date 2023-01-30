@@ -34,7 +34,7 @@ function SpeechTab({ onSubmit }: SpeechTabProps) {
                             {transcription}
                         </div>
                     </div>
-                    <SpeechToText onClick={setTranscription} onSubmit={onSubmit} />
+                    <SpeechToText onClick={setTranscription} onSubmit={onSubmit} text={text} />
                 </div>
             </div>
         </div>
