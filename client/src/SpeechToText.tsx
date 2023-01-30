@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Modal from './Modal'
 import './SpeechToText.css'
 
 type SpeechToTextProps = {
@@ -14,7 +15,8 @@ recognition.interimResults = true;
 recognition.lang = 'en-UK';
 
 function SpeechToText({ onClick, onSubmit }: SpeechToTextProps) {
-    const [isListening, setIsListening] = useState(false);
+    const [isListening, setIsListening] = useState<boolean>(false);
+    const [toggleModal, setToggleModal] = useState<boolean>(false);
     const [startTime, setStartTime] = useState(0)
     const [time, setTime] = useState(0)
     const [speech, setSpeech] = useState("")
@@ -62,20 +64,24 @@ function SpeechToText({ onClick, onSubmit }: SpeechToTextProps) {
         setTime(elapsedTime / 1000 / 60);
     }
 
-    return (<div>
-        {isListening ? (
-            <button className="stt-button" onClick={stopListen}>
-                Stop
-            </button>
-        ) : (
-            <button className="stt-button" onClick={() => setIsListening(true)}>
-                Record
-            </button>
-        )}
-        <button className="stt-button" onClick={() => { onSubmit(speech.split(" ").length / time, 85) }} disabled={!time}>
-            Submit
-        </button>
-    </div>
+    return (
+        <>
+            {toggleModal && <Modal onClick={() => onSubmit(speech.split(" ").length / time, 85)} onCancel={() => setToggleModal(false)} headerText="Confirmation" bodyText={`Are you sure you want to submit?`} buttonText="Submit" buttonTextColor="limegreen" />}
+            <div>
+                {isListening ? (
+                    <button className="stt-button" onClick={stopListen}>
+                        Stop
+                    </button>
+                ) : (
+                    <button className="stt-button" onClick={() => setIsListening(true)}>
+                        Record
+                    </button>
+                )}
+                <button className="stt-button" onClick={() => { setToggleModal(true) }} disabled={!time}>
+                    Submit
+                </button>
+            </div>
+        </>
     )
 }
 export default SpeechToText
