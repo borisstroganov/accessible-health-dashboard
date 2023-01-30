@@ -22,8 +22,10 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
                 <div className="sign-up-input-container">
                     <div className="sign-up-input">
                         <label htmlFor="email">Email:</label>
-                        <input autoFocus type="email" name="email" value={emailValue} onChange={(e) => setEmailValue(e.target.value)}></input>
-                        <div className="regex" style={{ "display": emailRegex.test(emailValue) ? "limegreen" : "" }}>Please enter a valid email address.</div>
+                        <input autoFocus type="email" name="email" value={emailValue} onChange={(e) => setEmailValue(e.target.value)} />
+                        <div className="regex" style={{ "display": emailRegex.test(emailValue) ? "limegreen" : "" }}>
+                            Please enter a valid email address.
+                        </div>
                     </div>
                     <div className="sign-up-input">
                         <label htmlFor="name">Name:</label>
@@ -31,11 +33,19 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
                     </div>
                     <div className="sign-up-input">
                         <label htmlFor="password">Password:</label>
-                        <input type="password" name="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)}></input>
-                        <div className="regex" style={{ "color": lengthRegex.test(passwordValue) ? "limegreen" : "" }}>Must be at least 8 characters.</div>
-                        <div className="regex" style={{ "color": uppercaseRegex.test(passwordValue) ? "limegreen" : "" }}>Must contain an uppercase letter.</div>
-                        <div className="regex" style={{ "color": lowercaseRegex.test(passwordValue) ? "limegreen" : "" }}>Must contain an lowercase letter.</div>
-                        <div className="regex" style={{ "color": numbersRegex.test(passwordValue) ? "limegreen" : "" }}>Must contain a number.</div>
+                        <input type="password" name="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)} />
+                        <div className="regex" style={{ "color": lengthRegex.test(passwordValue) ? "limegreen" : "" }}>
+                            Must be at least 8 characters.
+                        </div>
+                        <div className="regex" style={{ "color": uppercaseRegex.test(passwordValue) ? "limegreen" : "" }}>
+                            Must contain an uppercase letter.
+                        </div>
+                        <div className="regex" style={{ "color": lowercaseRegex.test(passwordValue) ? "limegreen" : "" }}>
+                            Must contain an lowercase letter.
+                        </div>
+                        <div className="regex" style={{ "color": numbersRegex.test(passwordValue) ? "limegreen" : "" }}>
+                            Must contain a number.
+                        </div>
                     </div>
 
                     <button className="sign-up-button" onClick={() => onClick(emailValue, nameValue, passwordValue)}>Register</button>

@@ -83,7 +83,9 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
 
     return (
         <>
-            {toggleModal && <Modal onClick={() => onSubmit(speech.split(" ").length / time, checkAccuracy())} onCancel={() => setToggleModal(false)} headerText="Confirmation" bodyText={`Are you sure you want to submit?`} buttonText="Submit" buttonTextColor="limegreen" />}
+            {toggleModal && <Modal onClick={() => onSubmit(speech.split(" ").length / time, checkAccuracy())}
+                onCancel={() => setToggleModal(false)} headerText="Confirmation" bodyText={`Are you sure you want to submit?`}
+                buttonText="Submit" buttonTextColor="limegreen" />}
             <div>
                 {isListening ? (
                     <button className="stt-button" onClick={stopListen}>

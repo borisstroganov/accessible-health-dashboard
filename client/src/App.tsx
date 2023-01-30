@@ -166,7 +166,11 @@ function App() {
             setErrorMessage(response.message);
             return;
         } else {
-            setBloodPressure({ systolicPressure: response.systolicPressure, diastolicPressure: response.diastolicPressure, date: response.date });
+            setBloodPressure({
+                systolicPressure: response.systolicPressure,
+                diastolicPressure: response.diastolicPressure,
+                date: response.date
+            });
         }
         setPageState("home");
     }
@@ -185,12 +189,15 @@ function App() {
 
     return (
         <>
-            {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input" text={"One or more fields are invalid."} color="grey" />}
+            {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
+                text={"One or more fields are invalid."} color="grey" />}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
-                    {toggleModal && <Modal onClick={handleLogOut} onCancel={() => setToggleModal(false)} headerText="Logout" bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
-                    {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure} speechRate={speechRate} />
+                    {toggleModal && <Modal onClick={handleLogOut} onCancel={() => setToggleModal(false)} headerText="Logout"
+                        bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
+                    {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure}
+                        speechRate={speechRate} />
                         : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                             : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
                                 : <SpeechTab onSubmit={handleSpeechSubmit} />}

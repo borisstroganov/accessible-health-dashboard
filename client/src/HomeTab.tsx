@@ -25,7 +25,8 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
 
     return (
         <div className="home-tab">
-            {notification && <Notification onClick={() => setNotification(false)} title="Missing Data" text="You haven't yet captured all the data, please capture the missing data." color="#4287f5" />}
+            {notification && <Notification onClick={() => setNotification(false)} title="Missing Data"
+                text="You haven't yet captured all the data, please capture the missing data." color="#4287f5" />}
             <h1>Accessible Health Dashboard</h1>
             <div className="dashboard">
                 <div className="dashboard-card" onClick={() => onClick("hr")}>
@@ -35,12 +36,17 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("bp")}>
                     <h2>Blood Pressure <ImDroplet /></h2>
-                    <h3>{bloodPressure.systolicPressure ? bloodPressure.systolicPressure + "/" + bloodPressure.diastolicPressure : "-"} mmHg</h3>
+                    <h3>
+                        {bloodPressure.systolicPressure ? bloodPressure.systolicPressure + "/" + bloodPressure.diastolicPressure : "-"} mmHg
+                    </h3>
                     <h3>{bloodPressure.date ? new Date(bloodPressure.date).toLocaleString() : "--/--/--, --:--:--"}</h3>
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("speech")}>
                     <h2>Speech Rate <BsSoundwave /></h2>
-                    <h3>{speechRate.wpm ? Math.round(speechRate.wpm) : "-"} WPM {speechRate.accuracy ? speechRate.accuracy + "% Accuracy": ""}</h3>
+                    <h3>
+                        {speechRate.wpm ? Math.round(speechRate.wpm) : "-"} WPM {speechRate.accuracy ? speechRate.accuracy
+                            + "% Accuracy" : ""}
+                    </h3>
                     <h3>{speechRate.date ? new Date(speechRate.date).toLocaleString() : "--/--/--, --:--:--"}</h3>
                 </div>
             </div>

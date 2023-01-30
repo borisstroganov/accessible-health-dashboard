@@ -16,13 +16,12 @@ function Login({ onClick, onSignUpClick }: LoginProps) {
                 <div className="login-input-container">
                     <div className="login-input">
                         <label htmlFor="email">Email:</label>
-                        <input autoFocus type="email" name="email" value={emailValue} onChange={(e) => setEmailValue(e.target.value)}></input>
+                        <input autoFocus type="email" name="email" value={emailValue} onChange={(e) => setEmailValue(e.target.value)} />
                     </div>
                     <div className="login-input">
                         <label htmlFor="password">Password:</label>
-                        <input type="password" name="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)}></input>
+                        <input type="password" name="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)} />
                     </div>
-
                     <button className="login-button" onClick={() => onClick(emailValue, passwordValue)}>Login</button>
                 </div>
                 <div className="login-sign-up">
