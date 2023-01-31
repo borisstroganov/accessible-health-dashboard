@@ -10,7 +10,7 @@ type NotificationProps = {
 
 function Notification({ onClick, title, text, color }: NotificationProps) {
     return (<div className="notification-wrapper">
-        <div className="notification" style={{backgroundColor: color}}>
+        <div className="notification" style={{ backgroundColor: color }}>
             <div className="notification-title">
                 <h3>{title}</h3>
             </div>
@@ -19,7 +19,7 @@ function Notification({ onClick, title, text, color }: NotificationProps) {
             </div>
         </div>
 
-        <button onClick={onClick} className="notification-button"><IoClose /></button>
+        <button onClick={onClick} className="notification-button"><IoClose style={{ "color": "black" }} /></button>
     </div>
     )
 }

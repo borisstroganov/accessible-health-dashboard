@@ -7,7 +7,10 @@ import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 
-import { SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest, CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, User } from "../../common/types";
+import {
+    SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
+    CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, User
+} from "../../common/types";
 
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
@@ -120,6 +123,14 @@ function retrieveSpeech(email: string): { hr: number; date: string } {
     return speeches[0];
 }
 
+function changePassword(email: string, password: string): void {
+    exec(`
+    UPDATE user 
+    SET password = ? 
+    WHERE email = ?;
+    `, [password, email]);
+}
+
 app.post("/signup", (req: Request, res: Response) => {
     const schema: JSONSchemaType<SignUpRequest> = {
         type: "object",
@@ -160,6 +171,49 @@ app.post("/signup", (req: Request, res: Response) => {
         email: email,
         name: name
     } as SignUpResponse)
+});
+
+app.post("/changePassword", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<ChangePasswordRequest> = {
+        type: "object",
+        properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string" },
+            newPassword: { type: "string", pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" },
+            confirmPassword: { type: "string" },
+        },
+        required: ["email", "password", "newPassword", "confirmPassword"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { email, password, newPassword, confirmPassword } = req.body as ChangePasswordRequest;
+
+    if (!loginUser(email, password)) {
+        return res.status(400).json({
+            message: "Invalid password."
+        })
+    } else if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+            message: "New passwords do not match."
+        })
+    } else if (newPassword === password) {
+        return res.status(400).json({
+            message: "New password cannot be the same as the old password."
+        })
+    } else {
+        changePassword(email, newPassword);
+        res.json({
+            email: email
+        } as ChangePasswordResponse)
+    }
 });
 
 app.post("/login", (req: Request, res: Response) => {

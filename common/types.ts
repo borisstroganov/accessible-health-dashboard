@@ -86,3 +86,14 @@ export type LatestSpeechResponse = {
     accuracy: number,
     date: string,
 }
+
+export type ChangePasswordRequest = {
+    email: string,
+    password: string,
+    newPassword: string,
+    confirmPassword: string,
+}
+
+export type ChangePasswordResponse = {
+    email: string,
+}

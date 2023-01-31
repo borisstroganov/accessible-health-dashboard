@@ -19,6 +19,7 @@ import { captureSpeech } from './services/captureSpeech'
 import { latestBp } from './services/latestBp'
 import { latestHr } from './services/latestHr'
 import { latestSpeech } from './services/latestSpeech'
+import { changePassword } from './services/changePassword'
 
 
 type User = {
@@ -31,6 +32,7 @@ function App() {
     const [signedUp, setSignedUp] = useState<boolean>(false);
     const [toggleModal, setToggleModal] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [user, setUser] = useState<User>()
 
@@ -128,10 +130,17 @@ function App() {
         setPageState(state)
     }
 
-    let handleChangePassword = (currentPassword: string, newPassword: string, confirmPassword: string) => {
-        console.log("currentPassword", currentPassword)
-        console.log("newPassword", newPassword)
-        console.log("confirmPassword", confirmPassword)
+    let handleChangePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+        const response = await changePassword(user?.email || "", currentPassword, newPassword, confirmPassword)
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Password changed.");
+            setErrorMessage("");
+        }
+        console.log(response);
     }
 
     let handleLogOut = () => {
@@ -200,6 +209,8 @@ function App() {
         <>
             {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
                 text={"One or more fields are invalid."} color="grey" />}
+            {successMessage && <Notification onClick={() => setSuccessMessage("")} title="Success"
+                text={successMessage} color="limegreen" />}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
