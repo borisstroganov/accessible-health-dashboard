@@ -1,0 +1,53 @@
+.account-tab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-content {
+    display: flex;
+    flex-direction: row;
+}
+
+.account-details {
+    display: flex;
+    flex-direction: column;
+    height: 160px;
+}
+
+.account-password {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    height: auto;
+}
+
+.account-details,
+.account-password {
+    width: 300px;
+    padding: 1em;
+    margin: 0.5em 2em;
+    border: 2px solid;
+    border-radius: 20px;
+    background-color: #5A5A5A;
+}
+
+.account-password-title {
+    border-bottom: 2px solid;
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.account-password-label {
+    font-size: 110%;
+    font-weight: 600;
+    padding: 2px;
+    margin-top: 6px;
+    margin-bottom: 2px;
+}
+
+.account-btn {
+    margin-top: 50px;
+}

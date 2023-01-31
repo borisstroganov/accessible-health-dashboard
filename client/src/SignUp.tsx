@@ -23,7 +23,7 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
                     <div className="sign-up-input">
                         <label htmlFor="email">Email:</label>
                         <input autoFocus type="email" name="email" value={emailValue} onChange={(e) => setEmailValue(e.target.value)} />
-                        <div className="regex" style={{ "display": emailRegex.test(emailValue) ? "limegreen" : "" }}>
+                        <div className="regex" style={{ "color": emailRegex.test(emailValue) ? "limegreen" : "" }}>
                             Please enter a valid email address.
                         </div>
                     </div>

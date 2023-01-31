@@ -26,6 +26,9 @@ function Navbar({ onClick, onLogOut, name }: NavbarProps) {
                     <a onClick={() => onClick("speech")}>Speech <BsSoundwave /></a>
                 </li>
                 <li>
+                    <a onClick={() => onClick("account")}>Account</a>
+                </li>
+                <li>
                     <a onClick={onLogOut}>Log Out</a>
                 </li>
             </ul>

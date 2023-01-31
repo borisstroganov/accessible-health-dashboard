@@ -4,6 +4,7 @@ import SignUp from './SignUp'
 import Navbar from './Navbar'
 import Notification from './Notification'
 import HomeTab from './HomeTab'
+import AccountTab from './AccountTab'
 import HrTab from './HrTab'
 import BpTab from './BpTab'
 import SpeechTab from './SpeechTab'
@@ -21,8 +22,8 @@ import { latestSpeech } from './services/latestSpeech'
 
 
 type User = {
-    name: string | null;
-    email: string | null;
+    name: string;
+    email: string;
 };
 
 function App() {
@@ -127,8 +128,14 @@ function App() {
         setPageState(state)
     }
 
+    let handleChangePassword = (currentPassword: string, newPassword: string, confirmPassword: string) => {
+        console.log("currentPassword", currentPassword)
+        console.log("newPassword", newPassword)
+        console.log("confirmPassword", confirmPassword)
+    }
+
     let handleLogOut = () => {
-        setUser({ email: null, name: null })
+        setUser({ email: "", name: "" })
         setBloodPressure({
             systolicPressure: 0,
             diastolicPressure: 0,
@@ -145,6 +152,8 @@ function App() {
         });
         setLoggedIn(false);
         setToggleModal(false);
+        setPageState("home");
+        setErrorMessage("")
     }
 
     let handleHrSubmit = async (hr: number) => {
@@ -198,9 +207,11 @@ function App() {
                         bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure}
                         speechRate={speechRate} />
-                        : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
-                            : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
-                                : <SpeechTab onSubmit={handleSpeechSubmit} />}
+                        : pageState === "account" ? <AccountTab onClick={handleChangePassword} email={user?.email || ""}
+                            name={user?.name || ""} />
+                            : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
+                                : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
+                                    : <SpeechTab onSubmit={handleSpeechSubmit} />}
 
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
