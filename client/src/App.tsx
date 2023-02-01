@@ -210,10 +210,14 @@ function App() {
         setPageState("home");
         if ((response.systolicPressure >= 140 && response.diastolicPressure >= 90)) {
             setWarningMessage("Your recent blood pressure capture is higher than the expected range. \
-            If your blood pressure remains high, please contact your GP.")
+            High blood pressure is often related to unhealthy lifestyle habits, such as smoking, drinking too much alcohol, \
+            being overweight and not exercising enough. \
+            If your blood pressure remains consistently high, please contact your GP.")
         } else if (response.systolicPressure <= 90 && response.diastolicPressure <= 60) {
             setWarningMessage("Your recent blood pressure capture is lower than the expected range. \
-            If your blood pressure remains low, please contact your GP.")
+            Low blood pressure may be caused by some medicines as a side effect. \
+            It can also be caused by a number of underlying conditions. \
+            If your blood pressure remains consistently low, please contact your GP.")
         }
     }
 
