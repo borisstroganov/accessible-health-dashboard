@@ -177,9 +177,12 @@ function App() {
             setHeartRate({ hr: response.hr, date: response.date });
         }
         setPageState("home");
-        if (response.hr >= 90) {
-            setWarningMessage("Your recent heart rate capture is outside the expected range. \
-            If your heart rate remains high, please contact a professional.")
+        if (response.hr >= 120) {
+            setWarningMessage("Your recent heart rate capture is higher than the expected range. \
+            If your heart rate remains consistently high, please contact your GP.")
+        } else if (response.hr <= 40) {
+            setWarningMessage("Your recent heart rate capture is lower than the expected range. \
+            If your heart rate remains consistently low, please contact your GP.")
         }
     }
 
@@ -199,10 +202,10 @@ function App() {
         setPageState("home");
         if ((response.systolicPressure >= 140 && response.diastolicPressure >= 90)) {
             setWarningMessage("Your recent blood pressure capture is higher than the expected range. \
-            If your blood pressure remains high, please contact a professional.")
+            If your blood pressure remains high, please contact your GP.")
         } else if (response.systolicPressure <= 90 && response.diastolicPressure <= 60) {
             setWarningMessage("Your recent blood pressure capture is lower than the expected range. \
-            If your blood pressure remains low, please contact a professional.")
+            If your blood pressure remains low, please contact your GP.")
         }
     }
 
