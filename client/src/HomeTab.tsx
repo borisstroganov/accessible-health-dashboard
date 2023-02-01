@@ -60,10 +60,10 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                             + "% Accuracy" : ""}
                     </h3>
                     <h3>{speechRate.date ? new Date(speechRate.date).toLocaleDateString() == new Date().toLocaleDateString() ?
-                        "Today, " + new Date(speechRate.date).toLocaleTimeString()
+                        "Today, " + new Date(speechRate.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                         : new Date(speechRate.date).toLocaleDateString() ==
                             new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toLocaleDateString() ?
-                            "Yesterday, " + new Date(speechRate.date).toLocaleTimeString()
+                            "Yesterday, " + new Date(speechRate.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                             : new Date(speechRate.date).toLocaleString([], { hour: "2-digit", minute: "2-digit" })
                         : "--/--/--, --:--"}</h3>
                 </div>

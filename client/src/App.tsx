@@ -34,6 +34,7 @@ function App() {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [warningMessage, setWarningMessage] = useState("");
+    const [infoMessage, setInfoMessage] = useState("");
 
     const [user, setUser] = useState<User>()
 
@@ -216,6 +217,13 @@ function App() {
             setErrorMessage(response.message);
             return;
         } else {
+            if (response.accuracy > speechRate.accuracy) {
+                setInfoMessage(`Your accuracy for the recent speech capture has increased by 
+                ${parseFloat((response.accuracy - speechRate.accuracy).toFixed(1))}%.`)
+            } else if (response.accuracy < speechRate.accuracy) {
+                setInfoMessage(`Your accuracy for the recent speech capture has decreased by 
+                ${parseFloat((speechRate.accuracy - response.accuracy).toFixed(1))}%.`)
+            }
             setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
         }
         setPageState("home");
@@ -224,11 +232,14 @@ function App() {
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
-                text={"One or more fields are invalid."} color="grey" /> :
-                warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
-                    text={warningMessage} color="coral" /> :
-                    successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
-                        text={successMessage} color="limegreen" /> : ""}
+                text={"One or more fields are invalid."} color="grey" />
+                : warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
+                    text={warningMessage} color="coral" />
+                    : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
+                        text={successMessage} color="limegreen" />
+                        : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
+                            text={infoMessage} color="teal" />
+                            : ""}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />

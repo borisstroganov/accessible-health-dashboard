@@ -77,7 +77,6 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
                 accuracy++;
             }
         });
-
         return parseFloat(((accuracy / speechWords.length) * 100).toFixed(1));
     }
 
