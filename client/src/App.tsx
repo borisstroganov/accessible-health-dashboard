@@ -211,6 +211,7 @@ function App() {
     }
 
     let handleSpeechSubmit = async (wpm: number, accuracy: number) => {
+        let message = ""
         const response = await captureSpeech(user?.email || "", wpm, accuracy);
         if ('message' in response) {
             console.log(response);
@@ -218,12 +219,21 @@ function App() {
             return;
         } else {
             if (response.accuracy > speechRate.accuracy) {
-                setInfoMessage(`Your accuracy for the recent speech capture has increased by 
-                ${parseFloat((response.accuracy - speechRate.accuracy).toFixed(1))}%.`)
+                message += `Your accuracy for the recent speech capture has increased by 
+                ${parseFloat((response.accuracy - speechRate.accuracy).toFixed(1))}%.`
             } else if (response.accuracy < speechRate.accuracy) {
-                setInfoMessage(`Your accuracy for the recent speech capture has decreased by 
-                ${parseFloat((speechRate.accuracy - response.accuracy).toFixed(1))}%.`)
+                message += `Your accuracy for the recent speech capture has decreased by 
+                ${parseFloat((speechRate.accuracy - response.accuracy).toFixed(1))}%.`
             }
+            if (response.wpm > speechRate.wpm) {
+                message += ` Your WPM for the recent speech capture has increased by 
+                ${Math.round(response.wpm - speechRate.wpm)}.`
+            } else if (response.wpm < speechRate.wpm) {
+                message += ` Your WPM for the recent speech capture has decreased by 
+                ${Math.round(speechRate.wpm - response.wpm)}.`
+            }
+
+            setInfoMessage(message);
             setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
         }
         setPageState("home");
