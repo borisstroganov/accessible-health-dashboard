@@ -9,13 +9,14 @@
 }
 
 .notification {
-    display:inline-block;
+    display: inline-block;
     justify-content: center;
     align-items: start;
-    padding: 1rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 10px;
     margin: 10px;
     min-width: 250px;
+    max-width: 500px;
 }
 
 .notification-title h3 {

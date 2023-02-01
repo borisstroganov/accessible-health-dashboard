@@ -33,6 +33,7 @@ function App() {
     const [toggleModal, setToggleModal] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [warningMessage, setWarningMessage] = useState("");
 
     const [user, setUser] = useState<User>()
 
@@ -117,6 +118,7 @@ function App() {
             return;
         } else {
             handleBackClick()
+            setSuccessMessage("Successfully signed up.")
         }
         console.log(response);
     }
@@ -175,6 +177,10 @@ function App() {
             setHeartRate({ hr: response.hr, date: response.date });
         }
         setPageState("home");
+        if (response.hr >= 90) {
+            setWarningMessage("Your recent heart rate capture is outside the expected range. \
+            If your heart rate remains high, please contact a professional.")
+        }
     }
 
     let handleBpSubmit = async (systolicPressure: number, diastolicPressure: number) => {
@@ -191,6 +197,13 @@ function App() {
             });
         }
         setPageState("home");
+        if ((response.systolicPressure >= 140 && response.diastolicPressure >= 90)) {
+            setWarningMessage("Your recent blood pressure capture is higher than the expected range. \
+            If your blood pressure remains high, please contact a professional.")
+        } else if (response.systolicPressure <= 90 && response.diastolicPressure <= 60) {
+            setWarningMessage("Your recent blood pressure capture is lower than the expected range. \
+            If your blood pressure remains low, please contact a professional.")
+        }
     }
 
     let handleSpeechSubmit = async (wpm: number, accuracy: number) => {
@@ -207,10 +220,12 @@ function App() {
 
     return (
         <>
-            {errorMessage && <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
-                text={"One or more fields are invalid."} color="grey" />}
-            {successMessage && <Notification onClick={() => setSuccessMessage("")} title="Success"
-                text={successMessage} color="limegreen" />}
+            {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
+                text={"One or more fields are invalid."} color="grey" /> :
+                warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
+                    text={warningMessage} color="coral" /> :
+                    successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
+                        text={successMessage} color="limegreen" /> : ""}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
@@ -223,7 +238,6 @@ function App() {
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
                                     : <SpeechTab onSubmit={handleSpeechSubmit} />}
-
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}
