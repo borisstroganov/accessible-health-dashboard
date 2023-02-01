@@ -96,6 +96,13 @@ function App() {
         }
     }
 
+    let resetMessages = () => {
+        setErrorMessage("");
+        setInfoMessage("");
+        setSuccessMessage("");
+        setWarningMessage("");
+    }
+
     let handleLogin = async (email: string, password: string) => {
         const response = await login(email, password);
 
@@ -165,7 +172,7 @@ function App() {
         setLoggedIn(false);
         setToggleModal(false);
         setPageState("home");
-        setErrorMessage("")
+        resetMessages();
     }
 
     let handleHrSubmit = async (hr: number) => {
@@ -257,11 +264,11 @@ function App() {
                         bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure}
                         speechRate={speechRate} />
-                        : pageState === "account" ? <AccountTab onClick={handleChangePassword} email={user?.email || ""}
-                            name={user?.name || ""} />
-                            : pageState === "hr" ? <HrTab onClick={handleHrSubmit} />
-                                : pageState === "bp" ? <BpTab onClick={handleBpSubmit} />
-                                    : <SpeechTab onSubmit={handleSpeechSubmit} />}
+                        : pageState === "account" ? <AccountTab onClick={handleChangePassword}
+                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""} />
+                            : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
+                                : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
+                                    : <SpeechTab onSubmit={handleSpeechSubmit} onBackClick={() => setPageState("home")} />}
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}

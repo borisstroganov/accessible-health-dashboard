@@ -5,9 +5,10 @@ import './SpeechTab.css'
 
 type SpeechTabProps = {
     onSubmit: (wpm: number, accuracy: number) => void;
+    onBackClick: () => void;
 }
 
-function SpeechTab({ onSubmit }: SpeechTabProps) {
+function SpeechTab({ onSubmit, onBackClick }: SpeechTabProps) {
     const [text, setText] = useState("Once upon a time, there lived a dragon. He lived in a cave deep in the forest and was very proud of his home. \
     One day, the dragon decided to explore the world outside of his cave. He flew high into the sky and \
     saw many wonderful things. He saw mountains, rivers, and forests. He even saw a castle in the distance. \
@@ -19,6 +20,7 @@ function SpeechTab({ onSubmit }: SpeechTabProps) {
     return (
         <div className="speech-tab">
             <h1>Speech Capture</h1>
+            <button className="home-button" onClick={onBackClick}>Home</button>
             <div className="speech-wrapper">
                 <div className="speech-text-wrapper">
                     <h3 className="title">Please Read / Listen to the Following Text:</h3>

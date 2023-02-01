@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import Notification from './Notification';
 import './AccountTab.css'
 
 type AccountTabProps = {
     onClick: (currentPassword: string, newPassword: string, confirmNewPassword: string) => void;
+    onBackClick: () => void;
     email: string;
     name: string;
 }
 
-function AccountTab({ onClick, email, name }: AccountTabProps) {
+function AccountTab({ onClick, onBackClick, email, name }: AccountTabProps) {
     const [currentPassword, setCurrentPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
@@ -27,6 +27,7 @@ function AccountTab({ onClick, email, name }: AccountTabProps) {
     return (
         <div className="account-tab">
             <h1>Account</h1>
+            <button className="home-button" onClick={onBackClick}>Home</button>
             <div className="account-content">
                 <div className="account-details">
                     <h3>Email: <code>{email}</code></h3>
