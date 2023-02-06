@@ -37,7 +37,13 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                         : new Date(heartRate.date).toLocaleDateString() ==
                             new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toLocaleDateString() ?
                             "Yesterday, " + new Date(heartRate.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                            : new Date(heartRate.date).toLocaleString([], { hour: "2-digit", minute: "2-digit" })
+                            : new Date(heartRate.date).toLocaleString([], {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })
                         : "--/--/--, --:--"}</h3>
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("bp")}>
@@ -50,7 +56,13 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                         : new Date(bloodPressure.date).toLocaleDateString() ==
                             new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toLocaleDateString() ?
                             "Yesterday, " + new Date(bloodPressure.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                            : new Date(bloodPressure.date).toLocaleString([], { hour: "2-digit", minute: "2-digit" })
+                            : new Date(bloodPressure.date).toLocaleString([], {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })
                         : "--/--/--, --:--"}</h3>
                 </div>
                 <div className="dashboard-card" onClick={() => onClick("speech")}>
@@ -64,7 +76,13 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
                         : new Date(speechRate.date).toLocaleDateString() ==
                             new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toLocaleDateString() ?
                             "Yesterday, " + new Date(speechRate.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                            : new Date(speechRate.date).toLocaleString([], { hour: "2-digit", minute: "2-digit" })
+                            : new Date(speechRate.date).toLocaleString([], {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })
                         : "--/--/--, --:--"}</h3>
                 </div>
             </div>
