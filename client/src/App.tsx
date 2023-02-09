@@ -25,6 +25,7 @@ import { changePassword } from './services/changePassword'
 type User = {
     name: string;
     email: string;
+    password: string;
 };
 
 function App() {
@@ -55,13 +56,21 @@ function App() {
     const [pageState, setPageState] = useState("home");
 
     useEffect(() => {
-        retrieveBp(user?.email || "")
-        retrieveHr(user?.email || "")
-        retrieveSpeech(user?.email || "")
+        if (loggedIn) {
+            retrieveBp()
+            retrieveHr()
+            retrieveSpeech()
+        }
     }, [user])
 
-    let retrieveBp = async (email: string) => {
-        let response = await latestBp(email);
+    useEffect(() => {
+        if (loggedIn && (!heartRate.hr || !bloodPressure.systolicPressure || !speechRate.wpm)) {
+            setInfoMessage("You haven't yet captured all the data, please capture the missing data.");
+        }
+    }, [heartRate, bloodPressure, speechRate])
+
+    let retrieveBp = async () => {
+        let response = await latestBp(user?.email || "", user?.password || "");
 
         if ('message' in response) {
             console.log(response);
@@ -72,8 +81,8 @@ function App() {
         }
     }
 
-    let retrieveHr = async (email: string) => {
-        let response = await latestHr(email);
+    let retrieveHr = async () => {
+        let response = await latestHr(user?.email || "", user?.password || "");
 
         if ('message' in response) {
             console.log(response);
@@ -84,8 +93,8 @@ function App() {
         }
     }
 
-    let retrieveSpeech = async (email: string) => {
-        let response = await latestSpeech(email);
+    let retrieveSpeech = async () => {
+        let response = await latestSpeech(user?.email || "", user?.password || "");
 
         if ('message' in response) {
             console.log(response);
@@ -113,7 +122,7 @@ function App() {
         } else {
             setErrorMessage("")
             setLoggedIn(true);
-            setUser({ email: response.email, name: response.name })
+            setUser({ email: response.email, name: response.name, password: password });
         }
         console.log(response);
     }
@@ -154,7 +163,7 @@ function App() {
     }
 
     let handleLogOut = () => {
-        setUser({ email: "", name: "" })
+        setUser({ email: "", name: "", password: "" })
         setBloodPressure({
             systolicPressure: 0,
             diastolicPressure: 0,
@@ -176,7 +185,7 @@ function App() {
     }
 
     let handleHrSubmit = async (hr: number) => {
-        const response = await captureHr(user?.email || "", hr);
+        const response = await captureHr(user?.email || "", user?.password || "", hr);
         if ('message' in response) {
             console.log(response);
             setErrorMessage(response.message);
@@ -195,7 +204,7 @@ function App() {
     }
 
     let handleBpSubmit = async (systolicPressure: number, diastolicPressure: number) => {
-        const response = await captureBp(user?.email || "", systolicPressure, diastolicPressure);
+        const response = await captureBp(user?.email || "", user?.password || "", systolicPressure, diastolicPressure);
         if ('message' in response) {
             console.log(response);
             setErrorMessage(response.message);
@@ -223,7 +232,7 @@ function App() {
 
     let handleSpeechSubmit = async (wpm: number, accuracy: number) => {
         let message = ""
-        const response = await captureSpeech(user?.email || "", wpm, accuracy);
+        const response = await captureSpeech(user?.email || "", user?.password || "", wpm, accuracy);
         if ('message' in response) {
             console.log(response);
             setErrorMessage(response.message);

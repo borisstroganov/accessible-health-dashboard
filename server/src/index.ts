@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import Database from "better-sqlite3";
 import { v4 as uuidv4 } from 'uuid';
@@ -6,6 +6,8 @@ import fs from "fs";
 import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
+import bAuth from "basic-auth";
+import crypto from "crypto";
 
 import {
     SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
@@ -18,6 +20,39 @@ addFormats(ajv, ["email", "password"]);
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+declare global {
+    namespace Express {
+        interface Request {
+            auth: { email: string }
+        }
+    }
+}
+
+function hash(str: string): string {
+    return crypto.createHash('sha256').update(str).digest('hex');
+}
+
+const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+    const result = bAuth(req);
+    if (!result) {
+        return res.status(401).json({
+            message: "Authentication required."
+        });
+    }
+
+    const { name: email, pass } = result;
+    if (!loginUser(email, pass)) {
+        return res.status(403).json({
+            message: "Invalid credentials."
+        });
+    }
+
+    req.auth = {
+        email: email,
+    };
+    next();
+}
 
 const db = new Database("./src/db/data.db", { verbose: console.log });
 db.pragma("foreign_keys = ON");
@@ -41,7 +76,7 @@ function createUser(email: string, name: string, password: string): void {
     exec(`
         INSERT INTO user (id, email, name, password)
         VALUES (?, ?, ?, ?);
-    `, [uuidv4(), email, name, password]);
+    `, [uuidv4(), email, name, hash(password)]);
 }
 
 function loginUser(email: string, password: string): boolean {
@@ -49,7 +84,7 @@ function loginUser(email: string, password: string): boolean {
         SELECT *
         FROM user
         WHERE email = ? AND password = ?;
-    `, [email, password]);
+    `, [email, hash(password)]);
 
     return user.length > 0;
 }
@@ -128,7 +163,7 @@ function changePassword(email: string, password: string): void {
     UPDATE user 
     SET password = ? 
     WHERE email = ?;
-    `, [password, email]);
+    `, [hash(password), email]);
 }
 
 app.post("/signup", (req: Request, res: Response) => {
@@ -173,16 +208,15 @@ app.post("/signup", (req: Request, res: Response) => {
     } as SignUpResponse)
 });
 
-app.post("/changePassword", (req: Request, res: Response) => {
+app.post("/changePassword", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<ChangePasswordRequest> = {
         type: "object",
         properties: {
-            email: { type: "string", format: "email" },
             password: { type: "string" },
             newPassword: { type: "string", pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" },
             confirmPassword: { type: "string" },
         },
-        required: ["email", "password", "newPassword", "confirmPassword"],
+        required: ["password", "newPassword", "confirmPassword"],
         additionalProperties: false
     }
 
@@ -194,9 +228,9 @@ app.post("/changePassword", (req: Request, res: Response) => {
         })
     }
 
-    const { email, password, newPassword, confirmPassword } = req.body as ChangePasswordRequest;
+    const { password, newPassword, confirmPassword } = req.body as ChangePasswordRequest;
 
-    if (!loginUser(email, password)) {
+    if (!loginUser(req.auth.email, password)) {
         return res.status(400).json({
             message: "Invalid password."
         })
@@ -209,9 +243,9 @@ app.post("/changePassword", (req: Request, res: Response) => {
             message: "New password cannot be the same as the old password."
         })
     } else {
-        changePassword(email, newPassword);
+        changePassword(req.auth.email, newPassword);
         res.json({
-            email: email
+            email: req.auth.email
         } as ChangePasswordResponse)
     }
 });
@@ -257,14 +291,13 @@ app.post("/login", (req: Request, res: Response) => {
     };
 });
 
-app.post("/captureHr", (req: Request, res: Response) => {
+app.post("/captureHr", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<CaptureHrRequest> = {
         type: "object",
         properties: {
-            email: { type: "string", format: "email" },
             hr: { type: "number", minimum: 0, maximum: 999 },
         },
-        required: ["email", "hr"],
+        required: ["hr"],
         additionalProperties: false
     }
 
@@ -277,26 +310,24 @@ app.post("/captureHr", (req: Request, res: Response) => {
     }
 
     const {
-        email,
         hr,
     } = req.body as CaptureHrRequest;
-    let date = captureUserHr(email, hr);
+    let date = captureUserHr(req.auth.email, hr);
     res.json({
-        email: email,
+        email: req.auth.email,
         hr: hr,
         date: date
     } as CaptureHrResponse)
 });
 
-app.post("/captureBp", (req: Request, res: Response) => {
+app.post("/captureBp", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<CaptureBpRequest> = {
         type: "object",
         properties: {
-            email: { type: "string", format: "email" },
             systolicPressure: { type: "number", minimum: 0, maximum: 999 },
             diastolicPressure: { type: "number", minimum: 0, maximum: 999 },
         },
-        required: ["email", "systolicPressure", "diastolicPressure"],
+        required: ["systolicPressure", "diastolicPressure"],
         additionalProperties: false
     }
 
@@ -309,28 +340,26 @@ app.post("/captureBp", (req: Request, res: Response) => {
     }
 
     const {
-        email,
         systolicPressure,
         diastolicPressure,
     } = req.body as CaptureBpRequest;
-    let date = captureUserBp(email, systolicPressure, diastolicPressure);
+    let date = captureUserBp(req.auth.email, systolicPressure, diastolicPressure);
     res.json({
-        email: email,
+        email: req.auth.email,
         systolicPressure: systolicPressure,
         diastolicPressure: diastolicPressure,
         date: date
     } as CaptureBpResponse)
 });
 
-app.post("/captureSpeech", (req: Request, res: Response) => {
+app.post("/captureSpeech", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<CaptureSpeechRequest> = {
         type: "object",
         properties: {
-            email: { type: "string", format: "email" },
             wpm: { type: "number", minimum: 0, maximum: 999 },
             accuracy: { type: "number", minimum: 0, maximum: 100 },
         },
-        required: ["email", "wpm", "accuracy"],
+        required: ["wpm", "accuracy"],
         additionalProperties: false
     }
 
@@ -343,24 +372,20 @@ app.post("/captureSpeech", (req: Request, res: Response) => {
     }
 
     const {
-        email,
         wpm,
         accuracy,
     } = req.body as CaptureSpeechRequest;
-    let date = captureUserSpeech(email, wpm, accuracy);
+    let date = captureUserSpeech(req.auth.email, wpm, accuracy);
     res.json({
-        email: email,
+        email: req.auth.email,
         wpm: wpm,
         accuracy: accuracy,
         date: date
     } as CaptureSpeechResponse)
 });
 
-app.get("/latestBp", (req: Request, res: Response) => {
-    const {
-        email
-    } = req.query;
-    const bp = retrieveBp(email as string);
+app.get("/latestBp", isLoggedIn, (req: Request, res: Response) => {
+    const bp = retrieveBp(req.auth.email as string);
     if (bp) {
         res.json(bp);
     } else {
@@ -372,11 +397,8 @@ app.get("/latestBp", (req: Request, res: Response) => {
     }
 });
 
-app.get("/latestHr", (req: Request, res: Response) => {
-    const {
-        email
-    } = req.query;
-    const hr = retrieveHr(email as string);
+app.get("/latestHr", isLoggedIn, (req: Request, res: Response) => {
+    const hr = retrieveHr(req.auth.email as string);
     if (hr) {
         res.json(hr);
     } else {
@@ -387,11 +409,8 @@ app.get("/latestHr", (req: Request, res: Response) => {
     }
 });
 
-app.get("/latestSpeech", (req: Request, res: Response) => {
-    const {
-        email
-    } = req.query;
-    const speech = retrieveSpeech(email as string);
+app.get("/latestSpeech", isLoggedIn, (req: Request, res: Response) => {
+    const speech = retrieveSpeech(req.auth.email as string);
     if (speech) {
         res.json(speech);
     } else {
@@ -401,14 +420,6 @@ app.get("/latestSpeech", (req: Request, res: Response) => {
             date: ""
         });
     }
-});
-
-app.get("/list", (req: Request, res: Response) => {
-    const {
-        email
-    } = req.query;
-    const users = listUsers(email as string);
-    res.json(users);
 });
 
 createTables();

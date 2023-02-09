@@ -2,12 +2,13 @@ import axios from 'axios';
 import constants from '../static/static.json'
 import { LatestSpeechResponse, ServerError } from "../../../common/types";
 
-export const latestSpeech = async (email: string): Promise<LatestSpeechResponse | ServerError> => {
+export const latestSpeech = async (email: string, password: string): Promise<LatestSpeechResponse | ServerError> => {
     const response = await axios({
         method: 'get',
         url: constants.URL + "/latestSpeech",
-        params: {
-            email: email
+        auth: {
+            username: email,
+            password: password
         }
     })
         .then(r => r.data as LatestSpeechResponse)

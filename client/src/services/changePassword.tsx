@@ -7,8 +7,11 @@ export const changePassword = async (email: string, currentPassword: string, new
     const response = await axios({
         method: 'post',
         url: constants.URL + "/changePassword",
+        auth: {
+            username: email,
+            password: currentPassword
+        },
         data: {
-            email: email,
             password: currentPassword,
             newPassword: newPassword,
             confirmPassword: confirmPassword

@@ -37,7 +37,6 @@ export type CaptureHrResponse = {
 }
 
 export type CaptureHrRequest = {
-    email: string,
     hr: number,
 }
 
@@ -49,7 +48,6 @@ export type CaptureBpResponse = {
 }
 
 export type CaptureBpRequest = {
-    email: string,
     systolicPressure: number,
     diastolicPressure: number,
 }
@@ -62,7 +60,6 @@ export type CaptureSpeechResponse = {
 }
 
 export type CaptureSpeechRequest = {
-    email: string,
     wpm: number,
     accuracy: number,
 }
@@ -88,7 +85,6 @@ export type LatestSpeechResponse = {
 }
 
 export type ChangePasswordRequest = {
-    email: string,
     password: string,
     newPassword: string,
     confirmPassword: string,

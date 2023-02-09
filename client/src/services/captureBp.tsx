@@ -2,12 +2,15 @@ import axios from 'axios';
 import constants from '../static/static.json'
 import { CaptureBpResponse, ServerError } from "../../../common/types";
 
-export const captureBp = async (email: string, systolicPressure: number, diastolicPressure: number): Promise<CaptureBpResponse | ServerError> => {
+export const captureBp = async (email: string, password: string, systolicPressure: number, diastolicPressure: number): Promise<CaptureBpResponse | ServerError> => {
     const response = await axios({
         method: 'post',
         url: constants.URL + "/captureBp",
+        auth: {
+            username: email,
+            password: password
+        },
         data: {
-            email: email,
             systolicPressure: systolicPressure,
             diastolicPressure: diastolicPressure,
         }

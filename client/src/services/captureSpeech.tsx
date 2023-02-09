@@ -2,12 +2,15 @@ import axios from 'axios';
 import constants from '../static/static.json'
 import { CaptureSpeechResponse, ServerError } from "../../../common/types";
 
-export const captureSpeech = async (email: string, wpm: number, accuracy: number): Promise<CaptureSpeechResponse | ServerError> => {
+export const captureSpeech = async (email: string, password: string, wpm: number, accuracy: number): Promise<CaptureSpeechResponse | ServerError> => {
     const response = await axios({
         method: 'post',
         url: constants.URL + "/captureSpeech",
+        auth: {
+            username: email,
+            password: password
+        },
         data: {
-            email: email,
             wpm: wpm,
             accuracy: accuracy,
         }

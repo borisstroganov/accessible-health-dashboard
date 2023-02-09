@@ -2,12 +2,13 @@ import axios from 'axios';
 import constants from '../static/static.json'
 import { LatestBpResponse, ServerError } from "../../../common/types";
 
-export const latestBp = async (email: string): Promise<LatestBpResponse | ServerError> => {
+export const latestBp = async (email: string, password: string): Promise<LatestBpResponse | ServerError> => {
     const response = await axios({
         method: 'get',
         url: constants.URL + "/latestBp",
-        params: {
-            email: email
+        auth: {
+            username: email,
+            password: password
         }
     })
         .then(r => r.data as LatestBpResponse)
