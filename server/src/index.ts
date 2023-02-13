@@ -9,6 +9,8 @@ import addFormats from "ajv-formats";
 import bAuth from "basic-auth";
 import crypto from "crypto";
 
+// import { query, exec, createTables } from './db';
+
 import {
     SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
     CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, User
@@ -89,7 +91,17 @@ function loginUser(email: string, password: string): boolean {
     return user.length > 0;
 }
 
-function captureUserHr(email: string, hr: number): string {
+function checkUserExists(email: string): boolean {
+    const user = query<{ id: string, email: string, name: string, password: string }>(`
+        SELECT *
+        FROM user
+        WHERE email = ?;
+    `, [email]);
+
+    return user.length > 0;
+}
+
+function captureHr(email: string, hr: number): string {
     let currentDate = new Date().toISOString();
     exec(`
         INSERT INTO heartRate (hrId, hr, date, userEmail)
@@ -98,7 +110,7 @@ function captureUserHr(email: string, hr: number): string {
     return currentDate;
 }
 
-function captureUserBp(email: string, systolicPressure: number, diastolicPressure: number): string {
+function captureBp(email: string, systolicPressure: number, diastolicPressure: number): string {
     let currentDate = new Date().toISOString();
     exec(`
         INSERT INTO bloodPressure (bpId, systolicPressure, diastolicPressure, date, userEmail)
@@ -107,7 +119,7 @@ function captureUserBp(email: string, systolicPressure: number, diastolicPressur
     return currentDate;
 }
 
-function captureUserSpeech(email: string, wpm: number, accuracy: number): string {
+function captureSpeech(email: string, wpm: number, accuracy: number): string {
     let currentDate = new Date().toISOString();
     exec(`
         INSERT INTO speechRate (speechId, wpm, accuracy, date, userEmail)
@@ -116,13 +128,14 @@ function captureUserSpeech(email: string, wpm: number, accuracy: number): string
     return currentDate;
 }
 
-function listUsers(email: string): Array<string> {
-    const users = query<{ id: string, email: string, name: string, password: string }>(`
-        SELECT *
+function getUserName(email: string): string {
+    const user = query<User>(`
+        SELECT name
         FROM user
         WHERE email = ?;
     `, [email]);
-    return users.map(user => user.name);
+
+    return user[0].name;
 }
 
 function retrieveBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string } {
@@ -158,7 +171,7 @@ function retrieveSpeech(email: string): { hr: number; date: string } {
     return speeches[0];
 }
 
-function changePassword(email: string, password: string): void {
+function changeUserPassword(email: string, password: string): void {
     exec(`
     UPDATE user 
     SET password = ? 
@@ -189,13 +202,7 @@ app.post("/signup", (req: Request, res: Response) => {
 
     const { email, name, password } = req.body as SignUpRequest;
 
-    const user = query<{ id: string, email: string, name: string, password: string }>(`
-        SELECT *
-        FROM user
-        WHERE email = ?;
-    `, [email]);
-
-    if (user.length > 0) {
+    if (checkUserExists(email)) {
         return res.status(400).json({
             message: "Account with this email already exists."
         })
@@ -243,7 +250,7 @@ app.post("/changePassword", isLoggedIn, (req: Request, res: Response) => {
             message: "New password cannot be the same as the old password."
         })
     } else {
-        changePassword(req.auth.email, newPassword);
+        changeUserPassword(req.auth.email, newPassword);
         res.json({
             email: req.auth.email
         } as ChangePasswordResponse)
@@ -274,15 +281,10 @@ app.post("/login", (req: Request, res: Response) => {
         password,
     } = req.body as LoginRequest;
     if (loginUser(email, password)) {
-        const user = query<User>(`
-            SELECT name
-            FROM user
-            WHERE email = ?;
-        `, [email]);
 
         res.json({
             email: email,
-            name: user[0].name
+            name: getUserName(email)
         } as LoginResponse)
     } else {
         return res.status(400).json({
@@ -312,7 +314,7 @@ app.post("/captureHr", isLoggedIn, (req: Request, res: Response) => {
     const {
         hr,
     } = req.body as CaptureHrRequest;
-    let date = captureUserHr(req.auth.email, hr);
+    let date = captureHr(req.auth.email, hr);
     res.json({
         email: req.auth.email,
         hr: hr,
@@ -343,7 +345,7 @@ app.post("/captureBp", isLoggedIn, (req: Request, res: Response) => {
         systolicPressure,
         diastolicPressure,
     } = req.body as CaptureBpRequest;
-    let date = captureUserBp(req.auth.email, systolicPressure, diastolicPressure);
+    let date = captureBp(req.auth.email, systolicPressure, diastolicPressure);
     res.json({
         email: req.auth.email,
         systolicPressure: systolicPressure,
@@ -375,7 +377,7 @@ app.post("/captureSpeech", isLoggedIn, (req: Request, res: Response) => {
         wpm,
         accuracy,
     } = req.body as CaptureSpeechRequest;
-    let date = captureUserSpeech(req.auth.email, wpm, accuracy);
+    let date = captureSpeech(req.auth.email, wpm, accuracy);
     res.json({
         email: req.auth.email,
         wpm: wpm,
@@ -423,5 +425,4 @@ app.get("/latestSpeech", isLoggedIn, (req: Request, res: Response) => {
 });
 
 createTables();
-
 app.listen(5000);
