@@ -18,6 +18,15 @@ CREATE TABLE IF NOT EXISTS therapist
 
     PRIMARY KEY (email)
 );
+CREATE TABLE IF NOT EXISTS invitation
+(
+    userEmail      TEXT NOT NULL,
+    therapistEmail TEXT NOT NULL,
+
+    PRIMARY KEY (userEmail, therapistEmail),
+    FOREIGN KEY (userEmail) REFERENCES user (email),
+    FOREIGN KEY (therapistEmail) REFERENCES therapist (email)
+);
 CREATE TABLE IF NOT EXISTS bloodPressure
 (
     bpId              TEXT     NOT NULL,

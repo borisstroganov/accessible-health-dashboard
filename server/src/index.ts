@@ -15,7 +15,8 @@ import {
     SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
     CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, AddTherapistRequest,
     AddTherapistResponse, TherapistSignUpRequest, TherapistSignUpResponse, TherapistLoginRequest, TherapistLoginResponse,
-    TherapistChangePasswordRequest, TherapistChangePasswordResponse, User
+    TherapistChangePasswordRequest, TherapistChangePasswordResponse, SendInvitationRequest, SendInvitationResponse,
+    AcceptInvitationRequest, AcceptInvitationResponse, RejectInvitationRequest, RejectInvitationResponse, User
 } from "../../common/types";
 
 const ajv = new Ajv();
@@ -242,6 +243,47 @@ function getTherapistName(email: string): string {
     `, [email]);
 
     return therapist[0].name;
+}
+
+function createInvitation(userEmail: string, therapistEmail: string): void {
+    exec(`
+        INSERT INTO invitation (userEmail, therapistEmail)
+        VALUES (?, ?);
+    `, [userEmail, therapistEmail]);
+}
+
+function getUserInvitations(userEmail: string): { therapistEmail: string }[] {
+    const userInvitations = query<{ therapistEmail: string; }>(`
+        SELECT therapistEmail
+        FROM invitation
+        WHERE userEmail = ?
+    `, [userEmail]);
+    return userInvitations;
+}
+
+function getTherapistInvitations(therapistEmail: string): { userEmail: string }[] {
+    const therapistInvitations = query<{ userEmail: string; }>(`
+        SELECT userEmail
+        FROM invitation
+        WHERE therapistEmail = ?
+    `, [therapistEmail]);
+    return therapistInvitations;
+}
+
+export function checkInvitation(userEmail: string, therapistEmail: string): boolean {
+    const invitations = query<{ userEmail: string, therapistEmail: string }>(`
+        SELECT *
+        FROM invitation
+        WHERE userEmail = ? AND therapistEmail = ?
+    `, [userEmail, therapistEmail])
+    return invitations.length > 0;
+}
+
+function deleteInvitation(userEmail: string, therapistEmail: string): void {
+    exec(`
+        DELETE FROM invitation
+        WHERE userEmail = ? AND therapistEmail = ?
+    `, [userEmail, therapistEmail]);
 }
 
 app.post("/signup", (req: Request, res: Response) => {
@@ -655,6 +697,120 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
         });
     }
 });
+
+app.post("/sendInvitation", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<SendInvitationRequest> = {
+        type: "object",
+        properties: {
+            userEmail: { type: "string", format: "email" },
+        },
+        required: ["userEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { userEmail } = req.body as SendInvitationRequest;
+    if (!checkUserExists(userEmail)) {
+        return res.status(400).json({
+            message: "Patient with this email does not exist."
+        })
+    } else if (getUserTherapistEmail(userEmail) !== null) {
+        return res.status(400).json({
+            message: "A therapist is already assigned to this patient."
+        })
+    } else {
+        createInvitation(userEmail, req.auth.email)
+        res.json({
+            userEmail: userEmail,
+            therapistEmail: req.auth.email,
+        } as SendInvitationResponse)
+    }
+});
+
+app.post("/acceptInvitation", isLoggedIn, (req, res) => {
+    const schema: JSONSchemaType<AcceptInvitationRequest> = {
+        type: "object",
+        properties: {
+            therapistEmail: { type: "string", format: "email" },
+        },
+        required: ["therapistEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { therapistEmail } = req.body as AcceptInvitationRequest;
+    if (!checkTherapistExists(therapistEmail)) {
+        return res.status(400).json({
+            message: "Therapist with this email does not exist."
+        })
+    } else if (checkInvitation(req.auth.email, therapistEmail)) {
+        return res.status(400).json({
+            message: "No invitation pending from this therapist."
+        })
+    } else if (getUserTherapistEmail(req.auth.email) !== null) {
+        return res.status(400).json({
+            message: "A therapist has already been assigned to this account."
+        })
+    } else {
+        deleteInvitation(req.auth.email, therapistEmail)
+        addTherapist(req.auth.email, therapistEmail)
+        res.json({
+            therapistEmail: therapistEmail,
+            therapistName: getTherapistName(therapistEmail)
+        } as AcceptInvitationResponse)
+    }
+});
+
+app.post("/rejectInvitation", isLoggedIn, (req, res) => {
+    const schema: JSONSchemaType<RejectInvitationRequest> = {
+        type: "object",
+        properties: {
+            therapistEmail: { type: "string", format: "email" },
+        },
+        required: ["therapistEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { therapistEmail } = req.body as RejectInvitationRequest;
+    if (!checkTherapistExists(therapistEmail)) {
+        return res.status(400).json({
+            message: "Therapist with this email does not exist."
+        })
+    } else if (checkInvitation(req.auth.email, therapistEmail)) {
+        return res.status(400).json({
+            message: "No invitation pending from this therapist."
+        })
+    } else {
+        deleteInvitation(req.auth.email, therapistEmail)
+        res.json({
+            therapistEmail: therapistEmail,
+        } as RejectInvitationResponse)
+    }
+});
+
+
 
 createTables();
 app.listen(5000);

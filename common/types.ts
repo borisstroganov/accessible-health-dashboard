@@ -139,3 +139,29 @@ export type RetrieveUserTherapistResponse = {
     therapistEmail: string,
     therapistName: string
 }
+
+export type SendInvitationRequest = {
+    userEmail: string
+}
+
+export type SendInvitationResponse = {
+    userEmail: string,
+    therapistEmail: string
+}
+
+export type AcceptInvitationRequest = {
+    therapistEmail: string
+}
+
+export type AcceptInvitationResponse = {
+    therapistEmail: string,
+    therapistName: string
+}
+
+export type RejectInvitationRequest = {
+    therapistEmail: string
+}
+
+export type RejectInvitationResponse = {
+    therapistEmail: string,
+}
