@@ -61,6 +61,14 @@ export function addTherapist(email: string, therapistEmail: string): void {
     `, [therapistEmail, email]);
 }
 
+export function removeTherapist(email: string): void {
+    exec(`
+    UPDATE user 
+    SET therapistEmail = NULL 
+    WHERE email = ?;
+    `, [email]);
+}
+
 export function getUserTherapistEmail(email: string): string {
     const user = query<User>(`
         SELECT therapistEmail

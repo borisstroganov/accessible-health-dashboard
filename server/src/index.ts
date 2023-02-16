@@ -47,7 +47,7 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const { name: email, pass } = result;
-    if (!loginUser(email, pass)) {
+    if (!loginUser(email, pass) && !loginTherapist(email, pass)) {
         return res.status(403).json({
             message: "Invalid credentials."
         });
@@ -188,6 +188,14 @@ function addTherapist(email: string, therapistEmail: string): void {
     SET therapistEmail = ? 
     WHERE email = ?;
     `, [therapistEmail, email]);
+}
+
+function removeTherapist(email: string): void {
+    exec(`
+    UPDATE user 
+    SET therapistEmail = NULL 
+    WHERE email = ?;
+    `, [email]);
 }
 
 function getUserTherapistEmail(email: string): string {
@@ -664,7 +672,6 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
     }
 
     const { therapistEmail } = req.body as AddTherapistRequest;
-    console.log(getUserTherapistEmail(req.auth.email))
 
     if (!checkTherapistExists(therapistEmail)) {
         return res.status(400).json({
@@ -683,6 +690,19 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
     }
 });
 
+app.patch("/removeTherapist", isLoggedIn, (req, res) => {
+    if (getUserTherapistEmail(req.auth.email) === null) {
+        return res.status(400).json({
+            message: "Therapist has not yet been assigned to this account."
+        })
+    } else {
+        removeTherapist(req.auth.email)
+        return res.json({
+            email: req.auth.email,
+        })
+    }
+});
+
 app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
     const therapistEmail = getUserTherapistEmail(req.auth.email as string);
     if (therapistEmail) {
@@ -698,7 +718,8 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
     }
 });
 
-app.post("/sendInvitation", (req: Request, res: Response) => {
+app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
+    console.log(req.auth.email)
     const schema: JSONSchemaType<SendInvitationRequest> = {
         type: "object",
         properties: {
@@ -734,6 +755,28 @@ app.post("/sendInvitation", (req: Request, res: Response) => {
     }
 });
 
+app.get("/getUserInvitations", isLoggedIn, (req, res) => {
+    const invitations = getUserInvitations(req.auth.email as string);
+    if (invitations) {
+        res.json(invitations);
+    } else {
+        res.json({
+            therapistEmail: ""
+        });
+    }
+});
+
+app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
+    const invitations = getTherapistInvitations(req.auth.email as string);
+    if (invitations) {
+        res.json(invitations);
+    } else {
+        res.json({
+            therapistEmail: ""
+        });
+    }
+});
+
 app.post("/acceptInvitation", isLoggedIn, (req, res) => {
     const schema: JSONSchemaType<AcceptInvitationRequest> = {
         type: "object",
@@ -757,7 +800,7 @@ app.post("/acceptInvitation", isLoggedIn, (req, res) => {
         return res.status(400).json({
             message: "Therapist with this email does not exist."
         })
-    } else if (checkInvitation(req.auth.email, therapistEmail)) {
+    } else if (!checkInvitation(req.auth.email, therapistEmail)) {
         return res.status(400).json({
             message: "No invitation pending from this therapist."
         })
@@ -798,7 +841,7 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
         return res.status(400).json({
             message: "Therapist with this email does not exist."
         })
-    } else if (checkInvitation(req.auth.email, therapistEmail)) {
+    } else if (!checkInvitation(req.auth.email, therapistEmail)) {
         return res.status(400).json({
             message: "No invitation pending from this therapist."
         })
@@ -809,8 +852,6 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
         } as RejectInvitationResponse)
     }
 });
-
-
 
 createTables();
 app.listen(5000);

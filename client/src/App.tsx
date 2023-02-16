@@ -286,7 +286,7 @@ function App() {
 
     return (
         <>
-            {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
+            {pageState === "home" && (errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
                 text={"One or more fields are invalid."} color="grey" />
                 : warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
                     text={warningMessage} color="coral" />
@@ -294,7 +294,7 @@ function App() {
                         text={successMessage} color="limegreen" />
                         : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
                             text={infoMessage} color="teal" />
-                            : ""}
+                            : "")}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
