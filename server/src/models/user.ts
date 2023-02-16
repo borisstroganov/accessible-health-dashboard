@@ -52,3 +52,21 @@ export function getUserName(email: string): string {
 
     return user[0].name;
 }
+
+export function addTherapist(email: string, therapistEmail: string): void {
+    exec(`
+    UPDATE user 
+    SET therapistEmail = ? 
+    WHERE email = ?;
+    `, [therapistEmail, email]);
+}
+
+export function getUserTherapistEmail(email: string): string {
+    const user = query<User>(`
+        SELECT therapistEmail
+        FROM user
+        WHERE email = ?;
+    `, [email]);
+
+    return user[0].therapistEmail;
+}

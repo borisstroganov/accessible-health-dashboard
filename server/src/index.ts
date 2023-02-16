@@ -13,7 +13,9 @@ import crypto from "crypto";
 
 import {
     SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
-    CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, User
+    CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, AddTherapistRequest,
+    AddTherapistResponse, TherapistSignUpRequest, TherapistSignUpResponse, TherapistLoginRequest, TherapistLoginResponse,
+    TherapistChangePasswordRequest, TherapistChangePasswordResponse, User
 } from "../../common/types";
 
 const ajv = new Ajv();
@@ -179,6 +181,69 @@ function changeUserPassword(email: string, password: string): void {
     `, [hash(password), email]);
 }
 
+function addTherapist(email: string, therapistEmail: string): void {
+    exec(`
+    UPDATE user 
+    SET therapistEmail = ? 
+    WHERE email = ?;
+    `, [therapistEmail, email]);
+}
+
+function getUserTherapistEmail(email: string): string {
+    const user = query<User>(`
+        SELECT therapistEmail
+        FROM user
+        WHERE email = ?;
+    `, [email]);
+
+    return user[0].therapistEmail;
+}
+
+function createTherapist(email: string, name: string, password: string): void {
+    exec(`
+        INSERT INTO therapist (id, email, name, password)
+        VALUES (?, ?, ?, ?);
+    `, [uuidv4(), email, name, hash(password)]);
+}
+
+function loginTherapist(email: string, password: string): boolean {
+    const user = query<User>(`
+        SELECT *
+        FROM therapist
+        WHERE email = ? AND password = ?;
+    `, [email, hash(password)]);
+
+    return user.length > 0;
+}
+
+function checkTherapistExists(email: string): boolean {
+    const therapist = query<User>(`
+        SELECT *
+        FROM therapist
+        WHERE email = ?;
+    `, [email]);
+
+    return therapist.length > 0;
+}
+
+function changeTherapistPassword(email: string, password: string): void {
+    exec(`
+    UPDATE therapist 
+    SET password = ? 
+    WHERE email = ?;
+    `, [hash(password), email]);
+}
+
+function getTherapistName(email: string): string {
+    const therapist = query<User>(`
+        SELECT name
+        FROM therapist
+        WHERE email = ?;
+    `, [email]);
+
+    return therapist[0].name;
+}
+
 app.post("/signup", (req: Request, res: Response) => {
     const schema: JSONSchemaType<SignUpRequest> = {
         type: "object",
@@ -202,7 +267,7 @@ app.post("/signup", (req: Request, res: Response) => {
 
     const { email, name, password } = req.body as SignUpRequest;
 
-    if (checkUserExists(email)) {
+    if (checkUserExists(email) || checkTherapistExists(email)) {
         return res.status(400).json({
             message: "Account with this email already exists."
         })
@@ -420,6 +485,173 @@ app.get("/latestSpeech", isLoggedIn, (req: Request, res: Response) => {
             wpm: 0,
             accuracy: 0,
             date: ""
+        });
+    }
+});
+
+app.post("/therapistSignup", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<TherapistSignUpRequest> = {
+        type: "object",
+        properties: {
+            email: { type: "string", format: "email" },
+            name: { type: "string", minLength: 5 },
+            password: { type: "string", pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" },
+        },
+        required: ["email", "name", "password"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { email, name, password } = req.body as TherapistSignUpRequest;
+
+    if (checkTherapistExists(email) || checkUserExists(email)) {
+        return res.status(400).json({
+            message: "Account with this email already exists."
+        })
+    }
+
+    createTherapist(email, name, password);
+    res.json({
+        email: email,
+        name: name
+    } as TherapistSignUpResponse)
+})
+
+app.post("/therapistLogin", (req: Request, res: Response) => {
+    const schema: JSONSchemaType<TherapistLoginRequest> = {
+        type: "object",
+        properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string" },
+        },
+        required: ["email", "password"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const {
+        email,
+        password,
+    } = req.body as TherapistLoginRequest;
+    if (loginTherapist(email, password)) {
+
+        res.json({
+            email: email,
+            name: getTherapistName(email)
+        } as TherapistLoginResponse)
+    } else {
+        return res.status(400).json({
+            message: "Invalid email or password."
+        })
+    };
+});
+
+app.post("/therapistChangePassword", isLoggedIn, (req: Request, res: Response) => {
+    const schema: JSONSchemaType<TherapistChangePasswordRequest> = {
+        type: "object",
+        properties: {
+            password: { type: "string" },
+            newPassword: { type: "string", pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$" },
+            confirmPassword: { type: "string" },
+        },
+        required: ["password", "newPassword", "confirmPassword"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { password, newPassword, confirmPassword } = req.body as TherapistChangePasswordRequest;
+
+    if (!loginTherapist(req.auth.email, password)) {
+        return res.status(400).json({
+            message: "Invalid password."
+        })
+    } else if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+            message: "New passwords do not match."
+        })
+    } else if (newPassword === password) {
+        return res.status(400).json({
+            message: "New password cannot be the same as the old password."
+        })
+    } else {
+        changeTherapistPassword(req.auth.email, newPassword);
+        res.json({
+            email: req.auth.email
+        } as TherapistChangePasswordResponse)
+    }
+});
+
+app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
+    const schema: JSONSchemaType<AddTherapistRequest> = {
+        type: "object",
+        properties: {
+            therapistEmail: { type: "string", format: "email" },
+        },
+        required: ["therapistEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { therapistEmail } = req.body as AddTherapistRequest;
+    console.log(getUserTherapistEmail(req.auth.email))
+
+    if (!checkTherapistExists(therapistEmail)) {
+        return res.status(400).json({
+            message: "Therapist with this email does not exist."
+        })
+    } else if (getUserTherapistEmail(req.auth.email) !== null) {
+        return res.status(400).json({
+            message: "Therapist already assigned."
+        })
+    } else {
+        addTherapist(req.auth.email, therapistEmail);
+        res.json({
+            email: req.auth.email,
+            therapistEmail: therapistEmail,
+        } as AddTherapistResponse)
+    }
+});
+
+app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
+    const therapistEmail = getUserTherapistEmail(req.auth.email as string);
+    if (therapistEmail) {
+        res.json({
+            therapistEmail: therapistEmail,
+            therapistName: getTherapistName(therapistEmail)
+        });
+    } else {
+        res.json({
+            therapistEmail: "",
+            therapistName: ""
         });
     }
 });

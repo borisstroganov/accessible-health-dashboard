@@ -6,9 +6,11 @@ type AccountTabProps = {
     onBackClick: () => void;
     email: string;
     name: string;
+    therapistEmail: string;
+    therapistName: string;
 }
 
-function AccountTab({ onClick, onBackClick, email, name }: AccountTabProps) {
+function AccountTab({ onClick, onBackClick, email, name, therapistEmail, therapistName }: AccountTabProps) {
     const [currentPassword, setCurrentPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
@@ -32,6 +34,7 @@ function AccountTab({ onClick, onBackClick, email, name }: AccountTabProps) {
                 <div className="account-details">
                     <h3>Email: <code>{email}</code></h3>
                     <h3>Name: <code>{name}</code></h3>
+                    <h3>Therapist: <code>{therapistEmail ? `${therapistName}, (${therapistEmail})` : "Unassigned"}</code></h3>
                 </div>
                 <div className="account-password">
                     <div className="account-password-title">Change Password</div>

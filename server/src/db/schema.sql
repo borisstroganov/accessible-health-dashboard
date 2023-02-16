@@ -1,5 +1,16 @@
 CREATE TABLE IF NOT EXISTS user
 (
+    id             TEXT NOT NULL,
+    email          TEXT NOT NULL,
+    name           TEXT NOT NULL,
+    password       TEXT NOT NULL,
+    therapistEmail TEXT,
+
+    PRIMARY KEY (email),
+    FOREIGN KEY (therapistEmail) REFERENCES therapist (email)
+);
+CREATE TABLE IF NOT EXISTS therapist
+(
     id       TEXT NOT NULL,
     email    TEXT NOT NULL,
     name     TEXT NOT NULL,

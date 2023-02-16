@@ -20,6 +20,7 @@ import { latestBp } from './services/latestBp'
 import { latestHr } from './services/latestHr'
 import { latestSpeech } from './services/latestSpeech'
 import { changePassword } from './services/changePassword'
+import { retrieveUserTherapist } from './services/retrieveUserTherapist'
 
 
 type User = {
@@ -27,6 +28,11 @@ type User = {
     email: string;
     password: string;
 };
+
+type Therapist = {
+    name: string;
+    email: string;
+}
 
 function App() {
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -38,6 +44,7 @@ function App() {
     const [infoMessage, setInfoMessage] = useState("");
 
     const [user, setUser] = useState<User>()
+    const [therapist, setTherapist] = useState<Therapist>()
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({
         hr: 0,
@@ -60,6 +67,7 @@ function App() {
             retrieveBp()
             retrieveHr()
             retrieveSpeech()
+            retrieveTherapist()
         }
     }, [user])
 
@@ -102,6 +110,22 @@ function App() {
             return;
         } else {
             setSpeechRate(response)
+        }
+    }
+
+    let retrieveTherapist = async () => {
+        let response = await retrieveUserTherapist(user?.email || "", user?.password || "");
+        console.log(response);
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setTherapist({
+                email: response.therapistEmail,
+                name: response.therapistName
+            })
         }
     }
 
@@ -164,6 +188,7 @@ function App() {
 
     let handleLogOut = () => {
         setUser({ email: "", name: "", password: "" })
+        setTherapist({ email: "", name: "" })
         setBloodPressure({
             systolicPressure: 0,
             diastolicPressure: 0,
@@ -278,7 +303,8 @@ function App() {
                     {pageState === "home" ? <HomeTab onClick={handleClick} heartRate={heartRate} bloodPressure={bloodPressure}
                         speechRate={speechRate} />
                         : pageState === "account" ? <AccountTab onClick={handleChangePassword}
-                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""} />
+                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
+                            therapistEmail={therapist?.email || ""} therapistName={therapist?.name || ""} />
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : <SpeechTab onSubmit={handleSpeechSubmit} onBackClick={() => setPageState("home")} />}

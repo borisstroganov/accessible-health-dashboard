@@ -27,7 +27,8 @@ export type User = {
     id: string,
     email: string,
     name: string,
-    password: string
+    password: string,
+    therapistEmail: string
 }
 
 export type CaptureHrResponse = {
@@ -92,4 +93,49 @@ export type ChangePasswordRequest = {
 
 export type ChangePasswordResponse = {
     email: string,
+}
+
+export type TherapistSignUpResponse = {
+    email: string;
+    name: string;
+}
+
+export type TherapistSignUpRequest = {
+    email: string;
+    name: string;
+    password: string;
+}
+
+export type TherapistLoginResponse = {
+    email: string;
+    name: string;
+}
+
+export type TherapistLoginRequest = {
+    email: string;
+    password: string;
+}
+
+export type AddTherapistRequest = {
+    therapistEmail: string,
+}
+
+export type AddTherapistResponse = {
+    email: string,
+    therapistEmail: string,
+}
+
+export type TherapistChangePasswordRequest = {
+    password: string,
+    newPassword: string,
+    confirmPassword: string,
+}
+
+export type TherapistChangePasswordResponse = {
+    email: string,
+}
+
+export type RetrieveUserTherapistResponse = {
+    therapistEmail: string,
+    therapistName: string
 }

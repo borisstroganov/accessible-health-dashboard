@@ -55,8 +55,7 @@ input[type="password"]:focus {
 .sign-up-back-button {
     width: 30%;
     max-width: 100px;
-    position: absolute;
-    bottom: 10vh;
+    margin-top: 10%;
 }
 
 .regex {
