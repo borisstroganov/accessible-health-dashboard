@@ -170,10 +170,17 @@ export type RejectInvitationResponse = {
     therapistEmail: string,
 }
 
+// export type GetUserInvitationsResponse = {
+//     therapistEmails: { therapistEmail: string }[],
+// }
 export type GetUserInvitationsResponse = {
-    therapistEmails: { therapistEmail: string }[],
+    therapists: { therapist: { therapistEmail: string, therapistName: string } }[],
 }
 
+// export type GetTherapistInvitationsResponse = {
+//     userEmails: { userEmail: string }[],
+// }
+
 export type GetTherapistInvitationsResponse = {
-    userEmails: { userEmail: string }[],
+    users: { user: { userEmail: string, userName: string } }[],
 }

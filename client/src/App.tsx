@@ -8,6 +8,7 @@ import AccountTab from './AccountTab'
 import HrTab from './HrTab'
 import BpTab from './BpTab'
 import SpeechTab from './SpeechTab'
+import InvitationsTab from './InvitationsTab'
 import Modal from './Modal'
 import './App.css'
 
@@ -21,6 +22,10 @@ import { latestHr } from './services/latestHr'
 import { latestSpeech } from './services/latestSpeech'
 import { changePassword } from './services/changePassword'
 import { retrieveUserTherapist } from './services/retrieveUserTherapist'
+import { removeTherapist } from './services/removeTherapist'
+import { acceptInvitation } from './services/acceptInvitation'
+import { getUserInvitations } from './services/getUserInvitations'
+import { rejectInvitation } from './services/rejectInvitation'
 
 
 type User = {
@@ -45,6 +50,9 @@ function App() {
 
     const [user, setUser] = useState<User>()
     const [therapist, setTherapist] = useState<Therapist>()
+    const [invitations, setInvitations] = useState<{ therapist: { therapistEmail: string, therapistName: string } }[]>(
+        [{ therapist: { therapistEmail: "", therapistName: "" } }]
+    )
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({
         hr: 0,
@@ -68,8 +76,15 @@ function App() {
             retrieveHr()
             retrieveSpeech()
             retrieveTherapist()
+            retrieveInvitations()
         }
     }, [user])
+
+    useEffect(() => {
+        if (pageState === "account" || pageState === "invitations") {
+            retrieveInvitations();
+        }
+    }, [pageState])
 
     useEffect(() => {
         if (loggedIn && (!heartRate.hr || !bloodPressure.systolicPressure || !speechRate.wpm)) {
@@ -115,7 +130,6 @@ function App() {
 
     let retrieveTherapist = async () => {
         let response = await retrieveUserTherapist(user?.email || "", user?.password || "");
-        console.log(response);
 
         if ('message' in response) {
             console.log(response);
@@ -126,6 +140,18 @@ function App() {
                 email: response.therapistEmail,
                 name: response.therapistName
             })
+        }
+    }
+
+    let retrieveInvitations = async () => {
+        let response = await getUserInvitations(user?.email || "", user?.password || "")
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setInvitations(response.therapists);
         }
     }
 
@@ -148,7 +174,6 @@ function App() {
             setLoggedIn(true);
             setUser({ email: response.email, name: response.name, password: password });
         }
-        console.log(response);
     }
 
     let handleSignUp = async (email: string, name: string, password: string) => {
@@ -161,7 +186,6 @@ function App() {
             handleBackClick()
             setSuccessMessage("Successfully signed up.")
         }
-        console.log(response);
     }
 
     let handleBackClick = () => {
@@ -183,7 +207,6 @@ function App() {
             setSuccessMessage("Password changed.");
             setErrorMessage("");
         }
-        console.log(response);
     }
 
     let handleLogOut = () => {
@@ -206,6 +229,7 @@ function App() {
         setLoggedIn(false);
         setToggleModal(false);
         setPageState("home");
+        setInvitations([{ therapist: { therapistEmail: "", therapistName: "" } }]);
         resetMessages();
     }
 
@@ -284,6 +308,43 @@ function App() {
         setPageState("home");
     }
 
+    let handleRemoveTherapist = async () => {
+        const response = await removeTherapist(user?.email || "", user?.password || "");
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Therapist successfully removed");
+            setTherapist({ email: "", name: "" });
+        }
+        setPageState("home");
+    }
+
+    let handleAcceptClick = async (therapistEmail: string, therapistName: string) => {
+        const response = await acceptInvitation(user?.email || "", user?.password || "", therapistEmail)
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Therapist successfully assigned");
+            setTherapist({ email: therapistEmail, name: therapistName });
+        }
+        retrieveInvitations();
+        setPageState("home");
+    }
+
+    let handleRejectClick = async (therapistEmail: string,) => {
+        const response = await rejectInvitation(user?.email || "", user?.password || "", therapistEmail)
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        }
+        retrieveInvitations();
+    }
+
     return (
         <>
             {pageState === "home" && (errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
@@ -304,10 +365,13 @@ function App() {
                         speechRate={speechRate} />
                         : pageState === "account" ? <AccountTab onClick={handleChangePassword}
                             onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
-                            therapistEmail={therapist?.email || ""} therapistName={therapist?.name || ""} />
+                            therapistEmail={therapist?.email || ""} therapistName={therapist?.name || ""}
+                            onRemoveClick={handleRemoveTherapist} onInvitationsClick={() => { setPageState("invitations") }} />
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
-                                    : <SpeechTab onSubmit={handleSpeechSubmit} onBackClick={() => setPageState("home")} />}
+                                    : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
+                                        onBackClick={() => setPageState("home")} />
+                                        : <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />}
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}

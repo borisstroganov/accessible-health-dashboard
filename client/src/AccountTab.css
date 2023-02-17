@@ -16,6 +16,19 @@
     height: fit-content;
 }
 
+.account-details h3 {
+    margin: 5px 0;
+
+}
+
+.account-details-div {
+    background-color: gray;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
 .account-password {
     display: flex;
     flex-direction: column;
@@ -50,4 +63,14 @@
 
 .account-btn {
     margin-top: 50px;
+}
+
+.account-remove-btn {
+    margin-top: 15px;
+    color: orangered;
+}
+
+.account-invitations-btn {
+    margin-top: 15px;
+    color: lightblue;
 }

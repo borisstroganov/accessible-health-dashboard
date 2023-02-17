@@ -742,6 +742,10 @@ app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
         return res.status(400).json({
             message: "Patient with this email does not exist."
         })
+    } else if (checkInvitation(userEmail, req.auth.email)) {
+        return res.status(400).json({
+            message: "An invitation has already been sent to this patient."
+        })
     } else if (getUserTherapistEmail(userEmail) !== null) {
         return res.status(400).json({
             message: "A therapist is already assigned to this patient."
@@ -758,13 +762,21 @@ app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
 app.get("/getUserInvitations", isLoggedIn, (req, res) => {
     const invitations = getUserInvitations(req.auth.email as string);
     if (invitations) {
-        res.json({
-            therapistEmails: invitations
-        } as GetUserInvitationsResponse)
+        const therapists = invitations.map(therapist => {
+            const therapistName = getTherapistName(therapist.therapistEmail);
+            return { therapist: { therapistEmail: therapist.therapistEmail, therapistName: therapistName } };
+        });
+
+        res.json({ therapists: therapists } as GetUserInvitationsResponse);
     } else {
         res.json({
-            therapistEmails: [
-                { therapistEmail: "" }
+            therapists: [
+                {
+                    therapist: {
+                        therapistEmail: "",
+                        therapistName: "",
+                    }
+                }
             ]
         } as GetUserInvitationsResponse);
     }
@@ -773,13 +785,21 @@ app.get("/getUserInvitations", isLoggedIn, (req, res) => {
 app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
     const invitations = getTherapistInvitations(req.auth.email as string);
     if (invitations) {
-        res.json({
-            userEmails: invitations
-        } as GetTherapistInvitationsResponse)
+        const users = invitations.map(user => {
+            const userName = getUserName(user.userEmail);
+            return { user: { userEmail: user.userEmail, userName: userName } };
+        });
+
+        res.json({ users: users } as GetTherapistInvitationsResponse);
     } else {
         res.json({
-            userEmails: [
-                { userEmail: "" }
+            users: [
+                {
+                    user: {
+                        userEmail: "",
+                        userName: "",
+                    }
+                }
             ]
         } as GetTherapistInvitationsResponse);
     }
