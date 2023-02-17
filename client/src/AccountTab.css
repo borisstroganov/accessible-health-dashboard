@@ -71,6 +71,7 @@
 }
 
 .account-invitations-btn {
+    position: relative;
     margin-top: 15px;
     color: lightblue;
 }

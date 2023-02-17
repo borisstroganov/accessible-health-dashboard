@@ -366,7 +366,8 @@ function App() {
                         : pageState === "account" ? <AccountTab onClick={handleChangePassword}
                             onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
                             therapistEmail={therapist?.email || ""} therapistName={therapist?.name || ""}
-                            onRemoveClick={handleRemoveTherapist} onInvitationsClick={() => { setPageState("invitations") }} />
+                            onRemoveClick={handleRemoveTherapist} onInvitationsClick={() => { setPageState("invitations") }}
+                            invitationsNumber={invitations.length} />
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}

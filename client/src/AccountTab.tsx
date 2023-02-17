@@ -11,10 +11,11 @@ type AccountTabProps = {
     name: string;
     therapistEmail: string;
     therapistName: string;
+    invitationsNumber: number;
 }
 
 function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, email, name,
-    therapistEmail, therapistName }: AccountTabProps) {
+    therapistEmail, therapistName, invitationsNumber }: AccountTabProps) {
     const [currentPassword, setCurrentPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
@@ -54,7 +55,7 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
                                 Remove Therapist
                             </button> :
                             <button type="button" className="account-invitations-btn" onClick={onInvitationsClick}>
-                                Invitations
+                                {`Invitations (${invitationsNumber})`}
                             </button>}
                     </div>
                     <div className="account-password">
