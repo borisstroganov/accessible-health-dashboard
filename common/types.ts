@@ -125,6 +125,10 @@ export type AddTherapistResponse = {
     therapistEmail: string,
 }
 
+export type RemoveTherapistResponse = {
+    email: string,
+}
+
 export type TherapistChangePasswordRequest = {
     password: string,
     newPassword: string,
@@ -164,4 +168,12 @@ export type RejectInvitationRequest = {
 
 export type RejectInvitationResponse = {
     therapistEmail: string,
+}
+
+export type GetUserInvitationsResponse = {
+    therapistEmails: { therapistEmail: string }[],
+}
+
+export type GetTherapistInvitationsResponse = {
+    userEmails: { userEmail: string }[],
 }

@@ -16,7 +16,8 @@ import {
     CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, AddTherapistRequest,
     AddTherapistResponse, TherapistSignUpRequest, TherapistSignUpResponse, TherapistLoginRequest, TherapistLoginResponse,
     TherapistChangePasswordRequest, TherapistChangePasswordResponse, SendInvitationRequest, SendInvitationResponse,
-    AcceptInvitationRequest, AcceptInvitationResponse, RejectInvitationRequest, RejectInvitationResponse, User
+    AcceptInvitationRequest, AcceptInvitationResponse, RejectInvitationRequest, RejectInvitationResponse, RemoveTherapistResponse,
+    GetUserInvitationsResponse, GetTherapistInvitationsResponse, User
 } from "../../common/types";
 
 const ajv = new Ajv();
@@ -699,7 +700,7 @@ app.patch("/removeTherapist", isLoggedIn, (req, res) => {
         removeTherapist(req.auth.email)
         return res.json({
             email: req.auth.email,
-        })
+        } as RemoveTherapistResponse)
     }
 });
 
@@ -719,7 +720,6 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
 });
 
 app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
-    console.log(req.auth.email)
     const schema: JSONSchemaType<SendInvitationRequest> = {
         type: "object",
         properties: {
@@ -758,22 +758,30 @@ app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
 app.get("/getUserInvitations", isLoggedIn, (req, res) => {
     const invitations = getUserInvitations(req.auth.email as string);
     if (invitations) {
-        res.json(invitations);
+        res.json({
+            therapistEmails: invitations
+        } as GetUserInvitationsResponse)
     } else {
         res.json({
-            therapistEmail: ""
-        });
+            therapistEmails: [
+                { therapistEmail: "" }
+            ]
+        } as GetUserInvitationsResponse);
     }
 });
 
 app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
     const invitations = getTherapistInvitations(req.auth.email as string);
     if (invitations) {
-        res.json(invitations);
+        res.json({
+            userEmails: invitations
+        } as GetTherapistInvitationsResponse)
     } else {
         res.json({
-            therapistEmail: ""
-        });
+            userEmails: [
+                { userEmail: "" }
+            ]
+        } as GetTherapistInvitationsResponse);
     }
 });
 
