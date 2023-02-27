@@ -9,6 +9,7 @@ import HrTab from './HrTab'
 import BpTab from './BpTab'
 import SpeechTab from './SpeechTab'
 import InvitationsTab from './InvitationsTab'
+import AssignmentsTab from './AssignmentsTab'
 import Modal from './Modal'
 import './App.css'
 
@@ -89,6 +90,8 @@ function App() {
     useEffect(() => {
         if (loggedIn && (!heartRate.hr || !bloodPressure.systolicPressure || !speechRate.wpm)) {
             setInfoMessage("You haven't yet captured all the data, please capture the missing data.");
+        } else {
+            setInfoMessage("")
         }
     }, [heartRate, bloodPressure, speechRate])
 
@@ -198,6 +201,10 @@ function App() {
     }
 
     let handleChangePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+        if (newPassword !== confirmPassword) {
+            setErrorMessage("The confirmation password must match the new password.")
+            return
+        }
         const response = await changePassword(user?.email || "", currentPassword, newPassword, confirmPassword)
         if ('message' in response) {
             console.log(response);
@@ -347,14 +354,14 @@ function App() {
 
     return (
         <>
-            {pageState === "home" && (errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
-                text={"One or more fields are invalid."} color="grey" />
-                : warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
-                    text={warningMessage} color="coral" />
-                    : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
-                        text={successMessage} color="limegreen" />
+            {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
+                text={errorMessage} color="rgba(128, 128, 128, 0.95)" />
+                : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
+                    text={successMessage} color="rgba(50, 205, 50, 0.95)" />
+                    : pageState === "home" && (warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
+                        text={warningMessage} color="rgba(255, 127, 80, 0.95)" />
                         : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
-                            text={infoMessage} color="teal" />
+                            text={infoMessage} color="rgba(0, 128, 128, 0.95)" />
                             : "")}
             {loggedIn ?
                 <div className="App">
@@ -372,7 +379,9 @@ function App() {
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
                                         onBackClick={() => setPageState("home")} />
-                                        : <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />}
+                                        : pageState === "invitations" ? <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />
+                                            : <AssignmentsTab onViewClick={() => setPageState("speech")}
+                                                onBackClick={() => setPageState("home")} assignments={[{ assignment: { assignmentTitle: "test", therapistEmail: "test@com.com", therapistName: "quick test" } }]} />}
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}

@@ -26,10 +26,10 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
     const [toggleModal, setToggleModal] = useState<boolean>(false);
 
     let handleClick = () => {
-        if (newPassword !== confirmPassword) {
-            return
-        }
         onClick(currentPassword, newPassword, confirmPassword);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
     }
 
     return (

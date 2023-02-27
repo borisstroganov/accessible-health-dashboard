@@ -13,7 +13,7 @@ function Navbar({ onClick, onLogOut, name }: NavbarProps) {
     return (
         <div className="navbar">
             <div className="dashboard-title">
-                <h3 onClick={() => onClick("home")}>Hello {name}!</h3>
+                <h3 style={{ fontSize: "140%" }} onClick={() => onClick("home")}>Hello {name}!</h3>
             </div>
             <ul>
                 <li>
@@ -24,6 +24,9 @@ function Navbar({ onClick, onLogOut, name }: NavbarProps) {
                 </li>
                 <li>
                     <a onClick={() => onClick("speech")}>Speech <BsSoundwave /></a>
+                </li>
+                <li>
+                    <a onClick={() => onClick("assignments")}>Assignments</a>
                 </li>
                 <li>
                     <a onClick={() => onClick("account")}>Account</a>
