@@ -4,12 +4,13 @@ import SpeechToText from './SpeechToText'
 import './SpeechTab.css'
 
 type SpeechTabProps = {
-    onSubmit: (wpm: number, accuracy: number, type: string) => void;
+    onSubmit: (wpm: number, accuracy: number, type: string, assignmentId: string) => void;
     onBackClick: () => void;
     assignmentText?: string;
+    assignmentId?: string;
 }
 
-function SpeechTab({ onSubmit, onBackClick, assignmentText }: SpeechTabProps) {
+function SpeechTab({ onSubmit, onBackClick, assignmentText, assignmentId }: SpeechTabProps) {
     const [text, setText] = useState(assignmentText || "Once upon a time, there lived a dragon. He lived in a cave deep in the forest \
     and was very proud of his home. One day, the dragon decided to explore the world outside of his cave. He flew high into the sky \
     and saw many wonderful things. He saw mountains, rivers, and forests. He even saw a castle in the distance. \
@@ -17,9 +18,10 @@ function SpeechTab({ onSubmit, onBackClick, assignmentText }: SpeechTabProps) {
     he noticed that the castle was surrounded by a large wall. He flew around the wall and noticed a small opening. \
     He flew through the opening and landed in the castle courtyard.");
     const [transcription, setTranscription] = useState('')
+    console.log(assignmentText)
 
     let handleSubmit = (wpm: number, accuracy: number) => {
-        onSubmit(wpm, accuracy, assignmentText ? "assignment" : "default")
+        onSubmit(wpm, accuracy, assignmentText ? "assignment" : "default", assignmentId ? assignmentId : "")
     }
 
     return (

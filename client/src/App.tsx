@@ -28,6 +28,7 @@ import { acceptInvitation } from './services/acceptInvitation'
 import { getUserInvitations } from './services/getUserInvitations'
 import { rejectInvitation } from './services/rejectInvitation'
 import { getUserAssignments } from './services/getUserAssignments'
+import { submitAssignment } from './services/submitAssignment'
 
 
 type User = {
@@ -58,10 +59,10 @@ function App() {
     const [assignments, setAssignments] = useState<{
         assignment: {
             assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string,
-            assignmentText: string
+            assignmentText: string, status: string,
         }
     }[]>([{
-        assignment: { assignmentId: "", therapistName: "", therapistEmail: "", assignmentTitle: "", assignmentText: "" }
+        assignment: { assignmentId: "", therapistName: "", therapistEmail: "", assignmentTitle: "", assignmentText: "", status: "" }
     }]);
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({
@@ -79,6 +80,7 @@ function App() {
         date: "",
     });
     const [assignmentText, setAssignmentText] = useState<string>("")
+    const [assignmentId, setAssignmentId] = useState<string>("")
 
     const [pageState, setPageState] = useState("home");
 
@@ -96,8 +98,11 @@ function App() {
     useEffect(() => {
         if (pageState === "account" || pageState === "invitations") {
             retrieveInvitations();
-        } else if (pageState === "speech") {
+        } else if (pageState === "assignments") {
+            retrieveAssignments();
+        } else if (pageState !== "speech") {
             setAssignmentText("");
+            setAssignmentId("");
         }
     }, [pageState])
 
@@ -312,9 +317,15 @@ function App() {
         }
     }
 
-    let handleSpeechSubmit = async (wpm: number, accuracy: number, type: string) => {
+    let handleSpeechSubmit = async (wpm: number, accuracy: number, type: string, assignmentId: string) => {
         let message = ""
-        const response = await captureSpeech(user?.email || "", user?.password || "", wpm, accuracy);
+        console.log("type", type)
+
+        const response = type === "default"
+            ? await captureSpeech(user?.email || "", user?.password || "", wpm, accuracy)
+            : await submitAssignment(user?.email || "", user?.password || "", assignmentId, wpm, accuracy);
+
+
         if ('message' in response) {
             console.log(response);
             setErrorMessage(response.message);
@@ -338,6 +349,7 @@ function App() {
             setInfoMessage(message);
             setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
         }
+        retrieveAssignments();
         setPageState("home");
     }
 
@@ -378,8 +390,9 @@ function App() {
         retrieveInvitations();
     }
 
-    let handleAttemptClick = (therapistEmail: string, assignmentText: string) => {
+    let handleAttemptClick = (assignmentId: string, assignmentText: string) => {
         setAssignmentText(assignmentText);
+        setAssignmentId(assignmentId);
         setPageState("speech");
     }
 
@@ -409,7 +422,8 @@ function App() {
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
-                                        onBackClick={() => setPageState("home")} assignmentText={assignmentText} />
+                                        onBackClick={() => setPageState("home")} assignmentText={assignmentText}
+                                        assignmentId={assignmentId} />
                                         : pageState === "invitations" ? <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />
                                             : <AssignmentsTab onAttemptClick={handleAttemptClick}
                                                 onBackClick={() => setPageState("home")} assignments={assignments} />}

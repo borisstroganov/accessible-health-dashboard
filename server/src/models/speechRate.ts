@@ -11,9 +11,9 @@ export function captureSpeech(email: string, wpm: number, accuracy: number): str
     return currentDate;
 }
 
-export function retrieveSpeech(email: string): { hr: number; date: string } {
-    const speeches = query<{ hr: number; date: string }>(`
-        SELECT wpm, accuracy, date
+export function retrieveSpeech(email: string): { speechId: string; wpm: number; accuracy: number; date: string } {
+    const speeches = query<{ speechId: string; wpm: number; accuracy: number; date: string }>(`
+        SELECT speechId, wpm, accuracy, date
         FROM speechRate
         WHERE userEmail = ?
         ORDER BY date DESC 

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import './AssignmentsTab.css'
 
 type AssignmentsTabProps = {
-    onAttemptClick: (therapistEmail: string, assignmentText: string) => void;
+    onAttemptClick: (assignmentId: string, assignmentText: string) => void;
     onBackClick: () => void;
-    assignments: { assignment: { assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string } }[],
+    assignments: { assignment: { assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string, status: string } }[],
 }
 
 function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: AssignmentsTabProps) {
@@ -18,19 +18,21 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
         }
     };
 
-    const tableRows = assignments.map(({ assignment: { assignmentId, therapistName, therapistEmail, assignmentTitle, assignmentText } }) => (
+    const tableRows = assignments.map(({ assignment: { assignmentId, therapistName, therapistEmail,
+        assignmentTitle, assignmentText, status } }) => (
         <>
             <tr key={assignmentId} onClick={() => handleRowClick(assignmentId)}>
                 <td>{assignmentTitle}</td>
                 <td>{therapistName}</td>
                 <td>{therapistEmail}</td>
+                <td>{status}</td>
                 <td>
-                    <button className="assignments-view-btn" onClick={() => onAttemptClick(therapistEmail, assignmentText)}>Attempt</button>
+                    <button disabled={status !== "created"} className="assignments-view-btn" onClick={() => onAttemptClick(assignmentId, assignmentText)}>Attempt</button>
                 </td>
             </tr>
             {expandedRows.includes(assignmentId) && (
                 <tr className="assignment-fold" key={assignmentId + "-fold"}>
-                    <td colSpan={4}>
+                    <td colSpan={5}>
                         <div className="assignment-fold-content">
                             <h3>Assignment Text:</h3>
                             {assignmentText}
@@ -54,6 +56,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                                     <th>Assignment Title</th>
                                     <th>Therapist Name</th>
                                     <th>Therapist Email</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

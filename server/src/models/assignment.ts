@@ -6,7 +6,7 @@ export function createAssignment(userEmail: string, therapistEmail: string, assi
     exec(`
         INSERT INTO assignment (assignmentId, userEmail, therapistEmail, assignmentTitle, assignmentText, status)
         VALUES (?, ?, ?, ?, ?, ?);
-    `, [uuidv4(), userEmail, therapistEmail, assignmentTitle, assignmentText, "created"]);
+    `, [uuidv4(), userEmail, therapistEmail, assignmentTitle, assignmentText, "To Do"]);
 }
 
 export function getUserAssignments(userEmail: string): { assignmentId: string }[] {
@@ -28,7 +28,7 @@ export function getTherapistAssignments(therapistEmail: string): { assignmentId:
 }
 
 export function getAssignmentTitle(assignmentId: string): string {
-    const assignments = query<{assignmentTitle: string; }>(`
+    const assignments = query<{ assignmentTitle: string; }>(`
         SELECT assignmentTitle
         FROM assignment
         WHERE assignmentId = ?
@@ -37,7 +37,7 @@ export function getAssignmentTitle(assignmentId: string): string {
 }
 
 export function getAssignmentText(assignmentId: string): string {
-    const assignments = query<{assignmentText: string; }>(`
+    const assignments = query<{ assignmentText: string; }>(`
         SELECT assignmentText
         FROM assignment
         WHERE assignmentId = ?
@@ -46,7 +46,7 @@ export function getAssignmentText(assignmentId: string): string {
 }
 
 export function getAssignmentUserEmail(assignmentId: string): string {
-    const assignments = query<{userEmail: string; }>(`
+    const assignments = query<{ userEmail: string; }>(`
         SELECT userEmail
         FROM assignment
         WHERE assignmentId = ?
@@ -55,10 +55,36 @@ export function getAssignmentUserEmail(assignmentId: string): string {
 }
 
 export function getAssignmentTherapistEmail(assignmentId: string): string {
-    const assignments = query<{therapistEmail: string; }>(`
+    const assignments = query<{ therapistEmail: string; }>(`
         SELECT therapistEmail
         FROM assignment
         WHERE assignmentId = ?
     `, [assignmentId]);
     return assignments[0].therapistEmail;
+}
+
+export function getAssignmentStatus(assignmentId: string): string {
+    const assignments = query<{ status: string; }>(`
+        SELECT status
+        FROM assignment
+        WHERE assignmentId = ?
+    `, [assignmentId]);
+    return assignments[0].status;
+}
+
+export function checkAssignment(assignmentId: string): boolean {
+    const assignment = query<{}>(`
+        SELECT *
+        from assignment
+        WHERE assignmentId = ?
+    `, [assignmentId])
+    return assignment.length > 0;
+}
+
+export function setAssignmentSpeech(assignmentId: string, speechId: string): void {
+    exec(`
+        UPDATE assignment 
+        SET speechId = ?, status = ?
+        WHERE assignmentId = ?;
+    `, [speechId, "Completed", assignmentId]);
 }

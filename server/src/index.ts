@@ -17,7 +17,7 @@ import { createTherapist, loginTherapist, checkTherapistExists, changeTherapistP
 import { createInvitation, getUserInvitations, getTherapistInvitations, checkInvitation, deleteInvitation } from './models/invitation';
 import {
     createAssignment, getUserAssignments, getTherapistAssignments, getAssignmentTitle, getAssignmentText,
-    getAssignmentUserEmail, getAssignmentTherapistEmail
+    getAssignmentUserEmail, getAssignmentTherapistEmail, getAssignmentStatus, checkAssignment, setAssignmentSpeech
 } from './models/assignment';
 
 import * as types from "../../common/types";
@@ -709,10 +709,12 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
             const therapistName = getTherapistName(therapistEmail);
             const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
             const assignmentText = getAssignmentText(assignment.assignmentId);
+            const status = getAssignmentStatus(assignment.assignmentId);
             return {
                 assignment: {
                     assignmentId: assignment.assignmentId, therapistName: therapistName,
-                    therapistEmail: therapistEmail, assignmentTitle: assignmentTitle, assignmentText: assignmentText
+                    therapistEmail: therapistEmail, assignmentTitle: assignmentTitle, assignmentText: assignmentText,
+                    status: status
                 }
             };
         });
@@ -727,13 +729,66 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
                         therapistName: "",
                         therapistEmail: "",
                         assignmentTitle: "",
-                        assignmentText: ""
+                        assignmentText: "",
+                        status: ""
                     }
                 }
             ]
         } as types.GetUserAssignmentsResponse);
     }
 });
+
+app.post("/submitAssignment", isLoggedIn, (req, res) => {
+    const schema: JSONSchemaType<types.SubmitAssignmentRequest> = {
+        type: "object",
+        properties: {
+            assignmentId: { type: "string" },
+            wpm: { type: "number", minimum: 0, maximum: 999 },
+            accuracy: { type: "number", minimum: 0, maximum: 100 },
+        },
+        required: ["assignmentId", "wpm", "accuracy"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const {
+        assignmentId,
+        wpm,
+        accuracy,
+    } = req.body as types.SubmitAssignmentRequest;
+
+    if (!checkAssignment(assignmentId)) {
+        return res.status(400).json({
+            message: "Assignment with the following ID does not exist."
+        })
+    } else if (getAssignmentUserEmail(assignmentId) !== req.auth.email) {
+        return res.status(400).json({
+            message: "Assignment assigned to different user."
+        })
+    } else if (getAssignmentStatus(assignmentId) !== "created") {
+        return res.status(400).json({
+            message: "Assignment has already been completed."
+        })
+    }
+
+    let date = captureSpeech(req.auth.email, wpm, accuracy);
+    let speech = retrieveSpeech(req.auth.email);
+    console.log(speech.speechId)
+    setAssignmentSpeech(assignmentId, speech.speechId);
+    res.json({
+        email: req.auth.email,
+        wpm: wpm,
+        accuracy: accuracy,
+        date: date
+    } as types.SubmitAssignmentResponse)
+})
 
 createTables();
 app.listen(5000);

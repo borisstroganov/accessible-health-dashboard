@@ -79,7 +79,7 @@ export type LatestHrResponse = {
 }
 
 export type LatestSpeechResponse = {
-    email: string,
+    speechId: string,
     wpm: number,
     accuracy: number,
     date: string,
@@ -194,7 +194,22 @@ export type SendAssignmentResponse = {
 export type GetUserAssignmentsResponse = {
     assignments: {
         assignment: {
-            assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string
+            assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string,
+            status: string
         }
     }[],
+}
+
+export type SubmitAssignmentRequest = {
+    assignmentId: string,
+    wpm: number,
+    accuracy: number
+}
+
+export type SubmitAssignmentResponse = {
+    email: string,
+    assignmentId: string,
+    wpm: number,
+    accuracy: number,
+    date: string,
 }
