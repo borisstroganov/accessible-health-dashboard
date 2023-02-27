@@ -29,15 +29,16 @@ CREATE TABLE IF NOT EXISTS invitation
 );
 CREATE TABLE IF NOT EXISTS assignment
 (
+    assignmentId    TEXT NOT NULL,
     userEmail       TEXT NOT NULL,
     therapistEmail  TEXT NOT NULL,
     assignmentTitle TEXT NOT NULL,
     assignmentText  TEXT NOT NULL,
     status          TEXT NOT NULL,
-    feedbackText    TEXT NOT NULL,
-    speechId        TEXT NOT NULL,
+    feedbackText    TEXT,
+    speechId        TEXT,
 
-    PRIMARY KEY (userEmail, therapistEmail),
+    PRIMARY KEY (assignmentId),
     FOREIGN KEY (userEmail) REFERENCES user (email),
     FOREIGN KEY (therapistEmail) REFERENCES therapist (email),
     FOREIGN KEY (speechId) REFERENCES speechRate (speechId)

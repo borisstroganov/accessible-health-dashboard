@@ -27,6 +27,7 @@ import { removeTherapist } from './services/removeTherapist'
 import { acceptInvitation } from './services/acceptInvitation'
 import { getUserInvitations } from './services/getUserInvitations'
 import { rejectInvitation } from './services/rejectInvitation'
+import { getUserAssignments } from './services/getUserAssignments'
 
 
 type User = {
@@ -53,7 +54,15 @@ function App() {
     const [therapist, setTherapist] = useState<Therapist>()
     const [invitations, setInvitations] = useState<{ therapist: { therapistEmail: string, therapistName: string } }[]>(
         [{ therapist: { therapistEmail: "", therapistName: "" } }]
-    )
+    );
+    const [assignments, setAssignments] = useState<{
+        assignment: {
+            assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string,
+            assignmentText: string
+        }
+    }[]>([{
+        assignment: { assignmentId: "", therapistName: "", therapistEmail: "", assignmentTitle: "", assignmentText: "" }
+    }]);
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({
         hr: 0,
@@ -80,6 +89,7 @@ function App() {
             retrieveSpeech()
             retrieveTherapist()
             retrieveInvitations()
+            retrieveAssignments()
         }
     }, [user])
 
@@ -159,6 +169,18 @@ function App() {
             return;
         } else {
             setInvitations(response.therapists);
+        }
+    }
+
+    let retrieveAssignments = async () => {
+        let response = await getUserAssignments(user?.email || "", user?.password || "")
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setAssignments(response.assignments);
         }
     }
 
@@ -390,13 +412,7 @@ function App() {
                                         onBackClick={() => setPageState("home")} assignmentText={assignmentText} />
                                         : pageState === "invitations" ? <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />
                                             : <AssignmentsTab onAttemptClick={handleAttemptClick}
-                                                onBackClick={() => setPageState("home")} assignments={[{
-                                                    assignment: {
-                                                        assignmentTitle: "test", assignmentText:
-                                                            "lorem ipsum text test quick brown fox jumped over the lazy dog",
-                                                        therapistEmail: "test@com.com", therapistName: "quick test"
-                                                    }
-                                                }]} />}
+                                                onBackClick={() => setPageState("home")} assignments={assignments} />}
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}

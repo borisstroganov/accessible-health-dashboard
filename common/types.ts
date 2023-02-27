@@ -177,3 +177,24 @@ export type GetUserInvitationsResponse = {
 export type GetTherapistInvitationsResponse = {
     users: { user: { userEmail: string, userName: string } }[],
 }
+
+export type SendAssignmentRequest = {
+    userEmail: string,
+    assignmentTitle: string,
+    assignmentText: string
+}
+
+export type SendAssignmentResponse = {
+    userEmail: string,
+    therapistEmail: string,
+    assignmentTitle: string,
+    assignmentText: string
+}
+
+export type GetUserAssignmentsResponse = {
+    assignments: {
+        assignment: {
+            assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string
+        }
+    }[],
+}

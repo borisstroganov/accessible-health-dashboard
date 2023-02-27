@@ -4,23 +4,23 @@ import './AssignmentsTab.css'
 type AssignmentsTabProps = {
     onAttemptClick: (therapistEmail: string, assignmentText: string) => void;
     onBackClick: () => void;
-    assignments: { assignment: { assignmentTitle: string, assignmentText: string, therapistEmail: string, therapistName: string } }[],
+    assignments: { assignment: { assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string } }[],
 }
 
 function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: AssignmentsTabProps) {
     const [expandedRows, setExpandedRows] = useState<string[]>([]);
 
-    const handleRowClick = (therapistEmail: string) => {
-        if (expandedRows.includes(therapistEmail)) {
-            setExpandedRows(expandedRows.filter((email) => email !== therapistEmail));
+    const handleRowClick = (assignmentId: string) => {
+        if (expandedRows.includes(assignmentId)) {
+            setExpandedRows(expandedRows.filter((id) => id !== assignmentId));
         } else {
-            setExpandedRows([...expandedRows, therapistEmail]);
+            setExpandedRows([...expandedRows, assignmentId]);
         }
     };
 
-    const tableRows = assignments.map(({ assignment: { assignmentTitle, assignmentText, therapistEmail, therapistName } }) => (
+    const tableRows = assignments.map(({ assignment: { assignmentId, therapistName, therapistEmail, assignmentTitle, assignmentText } }) => (
         <>
-            <tr key={therapistEmail} onClick={() => handleRowClick(therapistEmail)}>
+            <tr key={assignmentId} onClick={() => handleRowClick(assignmentId)}>
                 <td>{assignmentTitle}</td>
                 <td>{therapistName}</td>
                 <td>{therapistEmail}</td>
@@ -28,8 +28,8 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                     <button className="assignments-view-btn" onClick={() => onAttemptClick(therapistEmail, assignmentText)}>Attempt</button>
                 </td>
             </tr>
-            {expandedRows.includes(therapistEmail) && (
-                <tr className="assignment-fold" key={therapistEmail + "-fold"}>
+            {expandedRows.includes(assignmentId) && (
+                <tr className="assignment-fold" key={assignmentId + "-fold"}>
                     <td colSpan={4}>
                         <div className="assignment-fold-content">
                             <h3>Assignment Text:</h3>

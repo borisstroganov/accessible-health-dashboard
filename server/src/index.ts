@@ -1,13 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import { v4 as uuidv4 } from 'uuid';
 import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 import bAuth from "basic-auth";
-import crypto from "crypto";
 
-import { query, exec, createTables } from './db';
+import { createTables } from './db';
 import { captureBp, retrieveBp } from './models/bloodPressure';
 import { captureHr, retrieveHr } from './models/heartRate';
 import { captureSpeech, retrieveSpeech } from './models/speechRate';
@@ -17,6 +15,10 @@ import {
 } from './models/user';
 import { createTherapist, loginTherapist, checkTherapistExists, changeTherapistPassword, getTherapistName } from './models/therapist';
 import { createInvitation, getUserInvitations, getTherapistInvitations, checkInvitation, deleteInvitation } from './models/invitation';
+import {
+    createAssignment, getUserAssignments, getTherapistAssignments, getAssignmentTitle, getAssignmentText,
+    getAssignmentUserEmail, getAssignmentTherapistEmail
+} from './models/assignment';
 
 import * as types from "../../common/types";
 
@@ -47,6 +49,27 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     if (!loginUser(email, pass) && !loginTherapist(email, pass)) {
         return res.status(403).json({
             message: "Invalid credentials."
+        });
+    }
+
+    req.auth = {
+        email: email,
+    };
+    next();
+}
+
+const isTherapist = (req: Request, res: Response, next: NextFunction) => {
+    const result = bAuth(req);
+    if (!result) {
+        return res.status(401).json({
+            message: "Authentication required."
+        });
+    }
+
+    const { name: email, pass } = result;
+    if (!loginTherapist(email, pass)) {
+        return res.status(403).json({
+            message: "Therapist permissions required."
         });
     }
 
@@ -373,7 +396,7 @@ app.post("/therapistLogin", (req: Request, res: Response) => {
     };
 });
 
-app.post("/therapistChangePassword", isLoggedIn, (req: Request, res: Response) => {
+app.post("/therapistChangePassword", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.TherapistChangePasswordRequest> = {
         type: "object",
         properties: {
@@ -480,7 +503,7 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
     }
 });
 
-app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
+app.post("/sendInvitation", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.SendInvitationRequest> = {
         type: "object",
         properties: {
@@ -543,7 +566,7 @@ app.get("/getUserInvitations", isLoggedIn, (req, res) => {
     }
 });
 
-app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
+app.get("/getTherapistInvitations", isTherapist, (req, res) => {
     const invitations = getTherapistInvitations(req.auth.email as string);
     if (invitations) {
         const users = invitations.map(user => {
@@ -639,6 +662,76 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
         res.json({
             therapistEmail: therapistEmail,
         } as types.RejectInvitationResponse)
+    }
+});
+
+app.post("/sendAssignment", isTherapist, (req: Request, res: Response) => {
+    const schema: JSONSchemaType<types.SendAssignmentRequest> = {
+        type: "object",
+        properties: {
+            userEmail: { type: "string", format: "email" },
+            assignmentTitle: { type: "string" },
+            assignmentText: { type: "string" },
+        },
+        required: ["userEmail", "assignmentTitle", "assignmentText"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { userEmail, assignmentTitle, assignmentText } = req.body as types.SendAssignmentRequest;
+    if (!checkUserExists(userEmail)) {
+        return res.status(400).json({
+            message: "Patient with this email does not exist."
+        })
+    } else {
+        createAssignment(userEmail, req.auth.email, assignmentTitle, assignmentText)
+        res.json({
+            userEmail: userEmail,
+            therapistEmail: req.auth.email,
+            assignmentTitle: assignmentTitle,
+            assignmentText: assignmentText
+        } as types.SendAssignmentResponse)
+    }
+});
+
+app.get("/getUserAssignments", isLoggedIn, (req, res) => {
+    const assignmentIds = getUserAssignments(req.auth.email as string);
+    if (assignmentIds) {
+        const assignments = assignmentIds.map(assignment => {
+            const therapistEmail = getAssignmentTherapistEmail(assignment.assignmentId);
+            const therapistName = getTherapistName(therapistEmail);
+            const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
+            const assignmentText = getAssignmentText(assignment.assignmentId);
+            return {
+                assignment: {
+                    assignmentId: assignment.assignmentId, therapistName: therapistName,
+                    therapistEmail: therapistEmail, assignmentTitle: assignmentTitle, assignmentText: assignmentText
+                }
+            };
+        });
+
+        res.json({ assignments: assignments } as types.GetUserAssignmentsResponse);
+    } else {
+        res.json({
+            assignments: [
+                {
+                    assignment: {
+                        assignmentId: "",
+                        therapistName: "",
+                        therapistEmail: "",
+                        assignmentTitle: "",
+                        assignmentText: ""
+                    }
+                }
+            ]
+        } as types.GetUserAssignmentsResponse);
     }
 });
 
