@@ -1,24 +1,24 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import Database from "better-sqlite3";
 import { v4 as uuidv4 } from 'uuid';
-import fs from "fs";
 import cors from "cors";
 import Ajv, { JSONSchemaType } from "ajv";
 import addFormats from "ajv-formats";
 import bAuth from "basic-auth";
 import crypto from "crypto";
 
-// import { query, exec, createTables } from './db';
-
+import { query, exec, createTables } from './db';
+import { captureBp, retrieveBp } from './models/bloodPressure';
+import { captureHr, retrieveHr } from './models/heartRate';
+import { captureSpeech, retrieveSpeech } from './models/speechRate';
 import {
-    SignUpRequest, SignUpResponse, LoginRequest, LoginResponse, CaptureHrRequest, CaptureHrResponse, CaptureBpRequest,
-    CaptureBpResponse, CaptureSpeechResponse, CaptureSpeechRequest, ChangePasswordRequest, ChangePasswordResponse, AddTherapistRequest,
-    AddTherapistResponse, TherapistSignUpRequest, TherapistSignUpResponse, TherapistLoginRequest, TherapistLoginResponse,
-    TherapistChangePasswordRequest, TherapistChangePasswordResponse, SendInvitationRequest, SendInvitationResponse,
-    AcceptInvitationRequest, AcceptInvitationResponse, RejectInvitationRequest, RejectInvitationResponse, RemoveTherapistResponse,
-    GetUserInvitationsResponse, GetTherapistInvitationsResponse, User
-} from "../../common/types";
+    createUser, loginUser, checkUserExists, getUserName, changeUserPassword, addTherapist, removeTherapist,
+    getUserTherapistEmail
+} from './models/user';
+import { createTherapist, loginTherapist, checkTherapistExists, changeTherapistPassword, getTherapistName } from './models/therapist';
+import { createInvitation, getUserInvitations, getTherapistInvitations, checkInvitation, deleteInvitation } from './models/invitation';
+
+import * as types from "../../common/types";
 
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
@@ -33,10 +33,6 @@ declare global {
             auth: { email: string }
         }
     }
-}
-
-function hash(str: string): string {
-    return crypto.createHash('sha256').update(str).digest('hex');
 }
 
 const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
@@ -60,243 +56,8 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     next();
 }
 
-const db = new Database("./src/db/data.db", { verbose: console.log });
-db.pragma("foreign_keys = ON");
-
-function query<T>(sql: string, params: Array<any>): Array<T> {
-    return db.prepare(sql).all(params);
-}
-function exec(sql: string, params: Array<any>): void {
-    db.prepare(sql).run(params);
-}
-
-function createTables(): void {
-    const schema = fs.readFileSync("./src/db/schema.sql", {
-        encoding: 'utf8',
-        flag: 'r',
-    });
-    db.exec(schema);
-}
-
-function createUser(email: string, name: string, password: string): void {
-    exec(`
-        INSERT INTO user (id, email, name, password)
-        VALUES (?, ?, ?, ?);
-    `, [uuidv4(), email, name, hash(password)]);
-}
-
-function loginUser(email: string, password: string): boolean {
-    const user = query<{ id: string, email: string, name: string, password: string }>(`
-        SELECT *
-        FROM user
-        WHERE email = ? AND password = ?;
-    `, [email, hash(password)]);
-
-    return user.length > 0;
-}
-
-function checkUserExists(email: string): boolean {
-    const user = query<{ id: string, email: string, name: string, password: string }>(`
-        SELECT *
-        FROM user
-        WHERE email = ?;
-    `, [email]);
-
-    return user.length > 0;
-}
-
-function captureHr(email: string, hr: number): string {
-    let currentDate = new Date().toISOString();
-    exec(`
-        INSERT INTO heartRate (hrId, hr, date, userEmail)
-        VALUES (?, ?, DATETIME(?), ?);
-    `, [uuidv4(), hr, currentDate, email]);
-    return currentDate;
-}
-
-function captureBp(email: string, systolicPressure: number, diastolicPressure: number): string {
-    let currentDate = new Date().toISOString();
-    exec(`
-        INSERT INTO bloodPressure (bpId, systolicPressure, diastolicPressure, date, userEmail)
-        VALUES (?, ?, ?, DATETIME(?), ?);
-    `, [uuidv4(), systolicPressure, diastolicPressure, currentDate, email]);
-    return currentDate;
-}
-
-function captureSpeech(email: string, wpm: number, accuracy: number): string {
-    let currentDate = new Date().toISOString();
-    exec(`
-        INSERT INTO speechRate (speechId, wpm, accuracy, date, userEmail)
-        VALUES (?, ?, ?, DATETIME(?), ?);
-    `, [uuidv4(), wpm, accuracy, currentDate, email]);
-    return currentDate;
-}
-
-function getUserName(email: string): string {
-    const user = query<User>(`
-        SELECT name
-        FROM user
-        WHERE email = ?;
-    `, [email]);
-
-    return user[0].name;
-}
-
-function retrieveBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string } {
-    const bps = query<{ systolicPressure: number; diastolicPressure: number; date: string }>(`
-        SELECT systolicPressure, diastolicPressure, date
-        FROM bloodPressure
-        WHERE userEmail = ?
-        ORDER BY date DESC 
-        LIMIT 1;
-    `, [email]);
-    return bps[0];
-}
-
-function retrieveHr(email: string): { hr: number; date: string } {
-    const hrs = query<{ hr: number; date: string }>(`
-        SELECT hr, date
-        FROM heartRate
-        WHERE userEmail = ?
-        ORDER BY date DESC 
-        LIMIT 1;
-    `, [email]);
-    return hrs[0];
-}
-
-function retrieveSpeech(email: string): { hr: number; date: string } {
-    const speeches = query<{ hr: number; date: string }>(`
-        SELECT wpm, accuracy, date
-        FROM speechRate
-        WHERE userEmail = ?
-        ORDER BY date DESC 
-        LIMIT 1;
-    `, [email]);
-    return speeches[0];
-}
-
-function changeUserPassword(email: string, password: string): void {
-    exec(`
-    UPDATE user 
-    SET password = ? 
-    WHERE email = ?;
-    `, [hash(password), email]);
-}
-
-function addTherapist(email: string, therapistEmail: string): void {
-    exec(`
-    UPDATE user 
-    SET therapistEmail = ? 
-    WHERE email = ?;
-    `, [therapistEmail, email]);
-}
-
-function removeTherapist(email: string): void {
-    exec(`
-    UPDATE user 
-    SET therapistEmail = NULL 
-    WHERE email = ?;
-    `, [email]);
-}
-
-function getUserTherapistEmail(email: string): string {
-    const user = query<User>(`
-        SELECT therapistEmail
-        FROM user
-        WHERE email = ?;
-    `, [email]);
-
-    return user[0].therapistEmail;
-}
-
-function createTherapist(email: string, name: string, password: string): void {
-    exec(`
-        INSERT INTO therapist (id, email, name, password)
-        VALUES (?, ?, ?, ?);
-    `, [uuidv4(), email, name, hash(password)]);
-}
-
-function loginTherapist(email: string, password: string): boolean {
-    const user = query<User>(`
-        SELECT *
-        FROM therapist
-        WHERE email = ? AND password = ?;
-    `, [email, hash(password)]);
-
-    return user.length > 0;
-}
-
-function checkTherapistExists(email: string): boolean {
-    const therapist = query<User>(`
-        SELECT *
-        FROM therapist
-        WHERE email = ?;
-    `, [email]);
-
-    return therapist.length > 0;
-}
-
-function changeTherapistPassword(email: string, password: string): void {
-    exec(`
-    UPDATE therapist 
-    SET password = ? 
-    WHERE email = ?;
-    `, [hash(password), email]);
-}
-
-function getTherapistName(email: string): string {
-    const therapist = query<User>(`
-        SELECT name
-        FROM therapist
-        WHERE email = ?;
-    `, [email]);
-
-    return therapist[0].name;
-}
-
-function createInvitation(userEmail: string, therapistEmail: string): void {
-    exec(`
-        INSERT INTO invitation (userEmail, therapistEmail)
-        VALUES (?, ?);
-    `, [userEmail, therapistEmail]);
-}
-
-function getUserInvitations(userEmail: string): { therapistEmail: string }[] {
-    const userInvitations = query<{ therapistEmail: string; }>(`
-        SELECT therapistEmail
-        FROM invitation
-        WHERE userEmail = ?
-    `, [userEmail]);
-    return userInvitations;
-}
-
-function getTherapistInvitations(therapistEmail: string): { userEmail: string }[] {
-    const therapistInvitations = query<{ userEmail: string; }>(`
-        SELECT userEmail
-        FROM invitation
-        WHERE therapistEmail = ?
-    `, [therapistEmail]);
-    return therapistInvitations;
-}
-
-export function checkInvitation(userEmail: string, therapistEmail: string): boolean {
-    const invitations = query<{ userEmail: string, therapistEmail: string }>(`
-        SELECT *
-        FROM invitation
-        WHERE userEmail = ? AND therapistEmail = ?
-    `, [userEmail, therapistEmail])
-    return invitations.length > 0;
-}
-
-function deleteInvitation(userEmail: string, therapistEmail: string): void {
-    exec(`
-        DELETE FROM invitation
-        WHERE userEmail = ? AND therapistEmail = ?
-    `, [userEmail, therapistEmail]);
-}
-
 app.post("/signup", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<SignUpRequest> = {
+    const schema: JSONSchemaType<types.SignUpRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -316,7 +77,7 @@ app.post("/signup", (req: Request, res: Response) => {
         })
     }
 
-    const { email, name, password } = req.body as SignUpRequest;
+    const { email, name, password } = req.body as types.SignUpRequest;
 
     if (checkUserExists(email) || checkTherapistExists(email)) {
         return res.status(400).json({
@@ -328,11 +89,11 @@ app.post("/signup", (req: Request, res: Response) => {
     res.json({
         email: email,
         name: name
-    } as SignUpResponse)
+    } as types.SignUpResponse)
 });
 
 app.post("/changePassword", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<ChangePasswordRequest> = {
+    const schema: JSONSchemaType<types.ChangePasswordRequest> = {
         type: "object",
         properties: {
             password: { type: "string" },
@@ -351,7 +112,7 @@ app.post("/changePassword", isLoggedIn, (req: Request, res: Response) => {
         })
     }
 
-    const { password, newPassword, confirmPassword } = req.body as ChangePasswordRequest;
+    const { password, newPassword, confirmPassword } = req.body as types.ChangePasswordRequest;
 
     if (!loginUser(req.auth.email, password)) {
         return res.status(400).json({
@@ -369,12 +130,12 @@ app.post("/changePassword", isLoggedIn, (req: Request, res: Response) => {
         changeUserPassword(req.auth.email, newPassword);
         res.json({
             email: req.auth.email
-        } as ChangePasswordResponse)
+        } as types.ChangePasswordResponse)
     }
 });
 
 app.post("/login", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<LoginRequest> = {
+    const schema: JSONSchemaType<types.LoginRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -395,13 +156,13 @@ app.post("/login", (req: Request, res: Response) => {
     const {
         email,
         password,
-    } = req.body as LoginRequest;
+    } = req.body as types.LoginRequest;
     if (loginUser(email, password)) {
 
         res.json({
             email: email,
             name: getUserName(email)
-        } as LoginResponse)
+        } as types.LoginResponse)
     } else {
         return res.status(400).json({
             message: "Invalid email or password."
@@ -410,7 +171,7 @@ app.post("/login", (req: Request, res: Response) => {
 });
 
 app.post("/captureHr", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<CaptureHrRequest> = {
+    const schema: JSONSchemaType<types.CaptureHrRequest> = {
         type: "object",
         properties: {
             hr: { type: "number", minimum: 0, maximum: 999 },
@@ -429,17 +190,17 @@ app.post("/captureHr", isLoggedIn, (req: Request, res: Response) => {
 
     const {
         hr,
-    } = req.body as CaptureHrRequest;
+    } = req.body as types.CaptureHrRequest;
     let date = captureHr(req.auth.email, hr);
     res.json({
         email: req.auth.email,
         hr: hr,
         date: date
-    } as CaptureHrResponse)
+    } as types.CaptureHrResponse)
 });
 
 app.post("/captureBp", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<CaptureBpRequest> = {
+    const schema: JSONSchemaType<types.CaptureBpRequest> = {
         type: "object",
         properties: {
             systolicPressure: { type: "number", minimum: 0, maximum: 999 },
@@ -460,18 +221,18 @@ app.post("/captureBp", isLoggedIn, (req: Request, res: Response) => {
     const {
         systolicPressure,
         diastolicPressure,
-    } = req.body as CaptureBpRequest;
+    } = req.body as types.CaptureBpRequest;
     let date = captureBp(req.auth.email, systolicPressure, diastolicPressure);
     res.json({
         email: req.auth.email,
         systolicPressure: systolicPressure,
         diastolicPressure: diastolicPressure,
         date: date
-    } as CaptureBpResponse)
+    } as types.CaptureBpResponse)
 });
 
 app.post("/captureSpeech", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<CaptureSpeechRequest> = {
+    const schema: JSONSchemaType<types.CaptureSpeechRequest> = {
         type: "object",
         properties: {
             wpm: { type: "number", minimum: 0, maximum: 999 },
@@ -492,14 +253,14 @@ app.post("/captureSpeech", isLoggedIn, (req: Request, res: Response) => {
     const {
         wpm,
         accuracy,
-    } = req.body as CaptureSpeechRequest;
+    } = req.body as types.CaptureSpeechRequest;
     let date = captureSpeech(req.auth.email, wpm, accuracy);
     res.json({
         email: req.auth.email,
         wpm: wpm,
         accuracy: accuracy,
         date: date
-    } as CaptureSpeechResponse)
+    } as types.CaptureSpeechResponse)
 });
 
 app.get("/latestBp", isLoggedIn, (req: Request, res: Response) => {
@@ -541,7 +302,7 @@ app.get("/latestSpeech", isLoggedIn, (req: Request, res: Response) => {
 });
 
 app.post("/therapistSignup", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<TherapistSignUpRequest> = {
+    const schema: JSONSchemaType<types.TherapistSignUpRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -561,7 +322,7 @@ app.post("/therapistSignup", (req: Request, res: Response) => {
         })
     }
 
-    const { email, name, password } = req.body as TherapistSignUpRequest;
+    const { email, name, password } = req.body as types.TherapistSignUpRequest;
 
     if (checkTherapistExists(email) || checkUserExists(email)) {
         return res.status(400).json({
@@ -573,11 +334,11 @@ app.post("/therapistSignup", (req: Request, res: Response) => {
     res.json({
         email: email,
         name: name
-    } as TherapistSignUpResponse)
+    } as types.TherapistSignUpResponse)
 })
 
 app.post("/therapistLogin", (req: Request, res: Response) => {
-    const schema: JSONSchemaType<TherapistLoginRequest> = {
+    const schema: JSONSchemaType<types.TherapistLoginRequest> = {
         type: "object",
         properties: {
             email: { type: "string", format: "email" },
@@ -598,13 +359,13 @@ app.post("/therapistLogin", (req: Request, res: Response) => {
     const {
         email,
         password,
-    } = req.body as TherapistLoginRequest;
+    } = req.body as types.TherapistLoginRequest;
     if (loginTherapist(email, password)) {
 
         res.json({
             email: email,
             name: getTherapistName(email)
-        } as TherapistLoginResponse)
+        } as types.TherapistLoginResponse)
     } else {
         return res.status(400).json({
             message: "Invalid email or password."
@@ -613,7 +374,7 @@ app.post("/therapistLogin", (req: Request, res: Response) => {
 });
 
 app.post("/therapistChangePassword", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<TherapistChangePasswordRequest> = {
+    const schema: JSONSchemaType<types.TherapistChangePasswordRequest> = {
         type: "object",
         properties: {
             password: { type: "string" },
@@ -632,7 +393,7 @@ app.post("/therapistChangePassword", isLoggedIn, (req: Request, res: Response) =
         })
     }
 
-    const { password, newPassword, confirmPassword } = req.body as TherapistChangePasswordRequest;
+    const { password, newPassword, confirmPassword } = req.body as types.TherapistChangePasswordRequest;
 
     if (!loginTherapist(req.auth.email, password)) {
         return res.status(400).json({
@@ -650,12 +411,12 @@ app.post("/therapistChangePassword", isLoggedIn, (req: Request, res: Response) =
         changeTherapistPassword(req.auth.email, newPassword);
         res.json({
             email: req.auth.email
-        } as TherapistChangePasswordResponse)
+        } as types.TherapistChangePasswordResponse)
     }
 });
 
 app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<AddTherapistRequest> = {
+    const schema: JSONSchemaType<types.AddTherapistRequest> = {
         type: "object",
         properties: {
             therapistEmail: { type: "string", format: "email" },
@@ -672,7 +433,7 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
         })
     }
 
-    const { therapistEmail } = req.body as AddTherapistRequest;
+    const { therapistEmail } = req.body as types.AddTherapistRequest;
 
     if (!checkTherapistExists(therapistEmail)) {
         return res.status(400).json({
@@ -687,7 +448,7 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
         res.json({
             email: req.auth.email,
             therapistEmail: therapistEmail,
-        } as AddTherapistResponse)
+        } as types.AddTherapistResponse)
     }
 });
 
@@ -700,7 +461,7 @@ app.patch("/removeTherapist", isLoggedIn, (req, res) => {
         removeTherapist(req.auth.email)
         return res.json({
             email: req.auth.email,
-        } as RemoveTherapistResponse)
+        } as types.RemoveTherapistResponse)
     }
 });
 
@@ -720,7 +481,7 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
 });
 
 app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
-    const schema: JSONSchemaType<SendInvitationRequest> = {
+    const schema: JSONSchemaType<types.SendInvitationRequest> = {
         type: "object",
         properties: {
             userEmail: { type: "string", format: "email" },
@@ -737,7 +498,7 @@ app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
         })
     }
 
-    const { userEmail } = req.body as SendInvitationRequest;
+    const { userEmail } = req.body as types.SendInvitationRequest;
     if (!checkUserExists(userEmail)) {
         return res.status(400).json({
             message: "Patient with this email does not exist."
@@ -755,7 +516,7 @@ app.post("/sendInvitation", isLoggedIn, (req: Request, res: Response) => {
         res.json({
             userEmail: userEmail,
             therapistEmail: req.auth.email,
-        } as SendInvitationResponse)
+        } as types.SendInvitationResponse)
     }
 });
 
@@ -767,7 +528,7 @@ app.get("/getUserInvitations", isLoggedIn, (req, res) => {
             return { therapist: { therapistEmail: therapist.therapistEmail, therapistName: therapistName } };
         });
 
-        res.json({ therapists: therapists } as GetUserInvitationsResponse);
+        res.json({ therapists: therapists } as types.GetUserInvitationsResponse);
     } else {
         res.json({
             therapists: [
@@ -778,7 +539,7 @@ app.get("/getUserInvitations", isLoggedIn, (req, res) => {
                     }
                 }
             ]
-        } as GetUserInvitationsResponse);
+        } as types.GetUserInvitationsResponse);
     }
 });
 
@@ -790,7 +551,7 @@ app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
             return { user: { userEmail: user.userEmail, userName: userName } };
         });
 
-        res.json({ users: users } as GetTherapistInvitationsResponse);
+        res.json({ users: users } as types.GetTherapistInvitationsResponse);
     } else {
         res.json({
             users: [
@@ -801,12 +562,12 @@ app.get("/getTherapistInvitations", isLoggedIn, (req, res) => {
                     }
                 }
             ]
-        } as GetTherapistInvitationsResponse);
+        } as types.GetTherapistInvitationsResponse);
     }
 });
 
 app.post("/acceptInvitation", isLoggedIn, (req, res) => {
-    const schema: JSONSchemaType<AcceptInvitationRequest> = {
+    const schema: JSONSchemaType<types.AcceptInvitationRequest> = {
         type: "object",
         properties: {
             therapistEmail: { type: "string", format: "email" },
@@ -823,7 +584,7 @@ app.post("/acceptInvitation", isLoggedIn, (req, res) => {
         })
     }
 
-    const { therapistEmail } = req.body as AcceptInvitationRequest;
+    const { therapistEmail } = req.body as types.AcceptInvitationRequest;
     if (!checkTherapistExists(therapistEmail)) {
         return res.status(400).json({
             message: "Therapist with this email does not exist."
@@ -842,12 +603,12 @@ app.post("/acceptInvitation", isLoggedIn, (req, res) => {
         res.json({
             therapistEmail: therapistEmail,
             therapistName: getTherapistName(therapistEmail)
-        } as AcceptInvitationResponse)
+        } as types.AcceptInvitationResponse)
     }
 });
 
 app.post("/rejectInvitation", isLoggedIn, (req, res) => {
-    const schema: JSONSchemaType<RejectInvitationRequest> = {
+    const schema: JSONSchemaType<types.RejectInvitationRequest> = {
         type: "object",
         properties: {
             therapistEmail: { type: "string", format: "email" },
@@ -864,7 +625,7 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
         })
     }
 
-    const { therapistEmail } = req.body as RejectInvitationRequest;
+    const { therapistEmail } = req.body as types.RejectInvitationRequest;
     if (!checkTherapistExists(therapistEmail)) {
         return res.status(400).json({
             message: "Therapist with this email does not exist."
@@ -877,7 +638,7 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
         deleteInvitation(req.auth.email, therapistEmail)
         res.json({
             therapistEmail: therapistEmail,
-        } as RejectInvitationResponse)
+        } as types.RejectInvitationResponse)
     }
 });
 

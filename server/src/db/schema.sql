@@ -27,6 +27,21 @@ CREATE TABLE IF NOT EXISTS invitation
     FOREIGN KEY (userEmail) REFERENCES user (email),
     FOREIGN KEY (therapistEmail) REFERENCES therapist (email)
 );
+CREATE TABLE IF NOT EXISTS assignment
+(
+    userEmail       TEXT NOT NULL,
+    therapistEmail  TEXT NOT NULL,
+    assignmentTitle TEXT NOT NULL,
+    assignmentText  TEXT NOT NULL,
+    status          TEXT NOT NULL,
+    feedbackText    TEXT NOT NULL,
+    speechId        TEXT NOT NULL,
+
+    PRIMARY KEY (userEmail, therapistEmail),
+    FOREIGN KEY (userEmail) REFERENCES user (email),
+    FOREIGN KEY (therapistEmail) REFERENCES therapist (email),
+    FOREIGN KEY (speechId) REFERENCES speechRate (speechId)
+);
 CREATE TABLE IF NOT EXISTS bloodPressure
 (
     bpId              TEXT     NOT NULL,
