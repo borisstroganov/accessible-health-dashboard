@@ -1,0 +1,31 @@
+.assignments-view-btn {
+    margin: 5px;
+}
+
+.assignments-view-btn {
+    color: greenyellow;
+}
+
+.assignment-fold {
+    text-align: left;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.assignment-fold:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.assignment-fold td {
+    padding-top: 10px
+}
+
+.assignment-fold-content {
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.assignment-fold h3 {
+    margin: 10px 0px;
+}

@@ -69,6 +69,8 @@ function App() {
         accuracy: 0,
         date: "",
     });
+    const [assignmentText, setAssignmentText] = useState<string>("")
+
     const [pageState, setPageState] = useState("home");
 
     useEffect(() => {
@@ -84,6 +86,8 @@ function App() {
     useEffect(() => {
         if (pageState === "account" || pageState === "invitations") {
             retrieveInvitations();
+        } else if (pageState === "speech") {
+            setAssignmentText("");
         }
     }, [pageState])
 
@@ -286,7 +290,7 @@ function App() {
         }
     }
 
-    let handleSpeechSubmit = async (wpm: number, accuracy: number) => {
+    let handleSpeechSubmit = async (wpm: number, accuracy: number, type: string) => {
         let message = ""
         const response = await captureSpeech(user?.email || "", user?.password || "", wpm, accuracy);
         if ('message' in response) {
@@ -352,6 +356,11 @@ function App() {
         retrieveInvitations();
     }
 
+    let handleAttemptClick = (therapistEmail: string, assignmentText: string) => {
+        setAssignmentText(assignmentText);
+        setPageState("speech");
+    }
+
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
@@ -378,10 +387,16 @@ function App() {
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
-                                        onBackClick={() => setPageState("home")} />
+                                        onBackClick={() => setPageState("home")} assignmentText={assignmentText} />
                                         : pageState === "invitations" ? <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />
-                                            : <AssignmentsTab onViewClick={() => setPageState("speech")}
-                                                onBackClick={() => setPageState("home")} assignments={[{ assignment: { assignmentTitle: "test", therapistEmail: "test@com.com", therapistName: "quick test" } }]} />}
+                                            : <AssignmentsTab onAttemptClick={handleAttemptClick}
+                                                onBackClick={() => setPageState("home")} assignments={[{
+                                                    assignment: {
+                                                        assignmentTitle: "test", assignmentText:
+                                                            "lorem ipsum text test quick brown fox jumped over the lazy dog",
+                                                        therapistEmail: "test@com.com", therapistName: "quick test"
+                                                    }
+                                                }]} />}
                 </div>
                 : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
                     : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}

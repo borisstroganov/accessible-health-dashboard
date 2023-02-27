@@ -4,18 +4,23 @@ import SpeechToText from './SpeechToText'
 import './SpeechTab.css'
 
 type SpeechTabProps = {
-    onSubmit: (wpm: number, accuracy: number) => void;
+    onSubmit: (wpm: number, accuracy: number, type: string) => void;
     onBackClick: () => void;
+    assignmentText?: string;
 }
 
-function SpeechTab({ onSubmit, onBackClick }: SpeechTabProps) {
-    const [text, setText] = useState("Once upon a time, there lived a dragon. He lived in a cave deep in the forest and was very proud of his home. \
-    One day, the dragon decided to explore the world outside of his cave. He flew high into the sky and \
-    saw many wonderful things. He saw mountains, rivers, and forests. He even saw a castle in the distance. \
+function SpeechTab({ onSubmit, onBackClick, assignmentText }: SpeechTabProps) {
+    const [text, setText] = useState(assignmentText || "Once upon a time, there lived a dragon. He lived in a cave deep in the forest \
+    and was very proud of his home. One day, the dragon decided to explore the world outside of his cave. He flew high into the sky \
+    and saw many wonderful things. He saw mountains, rivers, and forests. He even saw a castle in the distance. \
     He was so excited that he decided to fly closer to the castle. As he got closer, \
     he noticed that the castle was surrounded by a large wall. He flew around the wall and noticed a small opening. \
     He flew through the opening and landed in the castle courtyard.");
     const [transcription, setTranscription] = useState('')
+
+    let handleSubmit = (wpm: number, accuracy: number) => {
+        onSubmit(wpm, accuracy, assignmentText ? "assignment" : "default")
+    }
 
     return (
         <div className="speech-tab">
@@ -36,7 +41,7 @@ function SpeechTab({ onSubmit, onBackClick }: SpeechTabProps) {
                             {transcription}
                         </div>
                     </div>
-                    <SpeechToText onClick={setTranscription} onSubmit={onSubmit} text={text} />
+                    <SpeechToText onClick={setTranscription} onSubmit={handleSubmit} text={text} />
                 </div>
             </div>
         </div>
