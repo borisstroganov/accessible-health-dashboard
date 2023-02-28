@@ -59,10 +59,16 @@ function App() {
     const [assignments, setAssignments] = useState<{
         assignment: {
             assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string,
-            assignmentText: string, status: string,
+            assignmentText: string, status: string, speech: {
+                wpm: number,
+                accuracy: number
+            }, feedbackText: string
         }
     }[]>([{
-        assignment: { assignmentId: "", therapistName: "", therapistEmail: "", assignmentTitle: "", assignmentText: "", status: "" }
+        assignment: {
+            assignmentId: "", therapistName: "", therapistEmail: "", assignmentTitle: "", assignmentText: "", status: "",
+            speech: { wpm: 0, accuracy: 0 }, feedbackText: ""
+        }
     }]);
 
     const [heartRate, setHeartRate] = useState<{ hr: number; date: string }>({

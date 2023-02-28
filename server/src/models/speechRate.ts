@@ -21,3 +21,12 @@ export function retrieveSpeech(email: string): { speechId: string; wpm: number; 
     `, [email]);
     return speeches[0];
 }
+
+export function retrieveSpeechById(speechId: string): { wpm: number; accuracy: number } {
+    const speech = query<{ wpm: number; accuracy: number}>(`
+        SELECT wpm, accuracy
+        FROM speechRate
+        WHERE speechId = ?
+    `, [speechId]);
+    return speech[0];
+}

@@ -195,7 +195,11 @@ export type GetUserAssignmentsResponse = {
     assignments: {
         assignment: {
             assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string, assignmentText: string,
-            status: string
+            status: string, speech: {
+                wpm: number,
+                accuracy: number
+            },
+            feedbackText: string,
         }
     }[],
 }

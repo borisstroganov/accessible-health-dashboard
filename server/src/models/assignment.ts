@@ -6,7 +6,7 @@ export function createAssignment(userEmail: string, therapistEmail: string, assi
     exec(`
         INSERT INTO assignment (assignmentId, userEmail, therapistEmail, assignmentTitle, assignmentText, status)
         VALUES (?, ?, ?, ?, ?, ?);
-    `, [uuidv4(), userEmail, therapistEmail, assignmentTitle, assignmentText, "To Do"]);
+    `, [uuidv4(), userEmail, therapistEmail, assignmentTitle, assignmentText, "todo"]);
 }
 
 export function getUserAssignments(userEmail: string): { assignmentId: string }[] {
@@ -86,5 +86,23 @@ export function setAssignmentSpeech(assignmentId: string, speechId: string): voi
         UPDATE assignment 
         SET speechId = ?, status = ?
         WHERE assignmentId = ?;
-    `, [speechId, "Completed", assignmentId]);
+    `, [speechId, "completed", assignmentId]);
+}
+
+export function getAssignmentSpeechId(assignmentId: string): string {
+    const speechId = query<{ speechId: string }>(`
+        SELECT speechId
+        FROM assignment
+        WHERE assignmentId = ?
+    `, [assignmentId]);
+    return speechId[0].speechId;
+}
+
+export function getAssignmentFeedback(assignmentId: string): string {
+    const feedback = query<{ feedbackText: string }>(`
+        SELECT feedbackText
+        FROM assignment
+        WHERE assignmentId = ?
+    `, [assignmentId]);
+    return feedback[0].feedbackText;
 }

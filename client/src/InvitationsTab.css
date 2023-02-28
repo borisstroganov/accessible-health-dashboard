@@ -8,9 +8,44 @@ table {
 }
 
 .tbl-content {
-    height: 400px;
     overflow-x: auto;
-    margin-top: 0px;
+}
+
+.tbl-empty {
+    display: none;
+}
+
+.tbl-full,
+.tbl-header,
+.tbl-content,
+.tbl-empty {
+    max-height: 0;
+}
+
+.tbl-empty.visible {
+    display: block;
+}
+
+.tbl-full.visible,
+.tbl-header.visible,
+.tbl-content.visible,
+.tbl-empty.visible {
+    max-height: 400px;
+    transition: max-height 0.5s ease-in;
+}
+
+.tbl-content table {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-spacing: 0;
+}
+
+.tbl-content table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.tbl-content table tbody tr:last-child {
+    border-bottom: none;
 }
 
 th {

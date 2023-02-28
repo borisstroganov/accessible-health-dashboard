@@ -8,7 +8,7 @@ import bAuth from "basic-auth";
 import { createTables } from './db';
 import { captureBp, retrieveBp } from './models/bloodPressure';
 import { captureHr, retrieveHr } from './models/heartRate';
-import { captureSpeech, retrieveSpeech } from './models/speechRate';
+import { captureSpeech, retrieveSpeech, retrieveSpeechById } from './models/speechRate';
 import {
     createUser, loginUser, checkUserExists, getUserName, changeUserPassword, addTherapist, removeTherapist,
     getUserTherapistEmail
@@ -17,7 +17,9 @@ import { createTherapist, loginTherapist, checkTherapistExists, changeTherapistP
 import { createInvitation, getUserInvitations, getTherapistInvitations, checkInvitation, deleteInvitation } from './models/invitation';
 import {
     createAssignment, getUserAssignments, getTherapistAssignments, getAssignmentTitle, getAssignmentText,
-    getAssignmentUserEmail, getAssignmentTherapistEmail, getAssignmentStatus, checkAssignment, setAssignmentSpeech
+    getAssignmentUserEmail, getAssignmentTherapistEmail, getAssignmentStatus, checkAssignment, setAssignmentSpeech,
+    getAssignmentSpeechId,
+    getAssignmentFeedback
 } from './models/assignment';
 
 import * as types from "../../common/types";
@@ -710,11 +712,23 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
             const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
             const assignmentText = getAssignmentText(assignment.assignmentId);
             const status = getAssignmentStatus(assignment.assignmentId);
+            let speech: { wpm: number, accuracy: number } = { wpm: 0, accuracy: 0 };
+            if (status !== "todo") {
+                speech = retrieveSpeechById(getAssignmentSpeechId(assignment.assignmentId));
+            }
+            let feedbackText: string = ""
+            if (status === "reviewed") {
+                feedbackText = getAssignmentFeedback(assignment.assignmentId);
+            }
             return {
                 assignment: {
-                    assignmentId: assignment.assignmentId, therapistName: therapistName,
-                    therapistEmail: therapistEmail, assignmentTitle: assignmentTitle, assignmentText: assignmentText,
-                    status: status
+                    assignmentId: assignment.assignmentId,
+                    therapistName: therapistName,
+                    therapistEmail: therapistEmail,
+                    assignmentTitle: assignmentTitle,
+                    assignmentText: assignmentText,
+                    status: status, speech: speech,
+                    feedbackText: feedbackText
                 }
             };
         });

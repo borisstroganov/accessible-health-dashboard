@@ -26,7 +26,7 @@ function InvitationsTab({ onAcceptClick, onRejectClick, onBackClick, invitations
             <button className="home-button" onClick={onBackClick}>Home</button>
             {tableRows.length ?
                 <>
-                    <div className="tbl-header">
+                    <div className="tbl-header visible">
                         <table>
                             <thead>
                                 <tr>
@@ -37,7 +37,7 @@ function InvitationsTab({ onAcceptClick, onRejectClick, onBackClick, invitations
                             </thead>
                         </table>
                     </div>
-                    <div className="tbl-content">
+                    <div className="tbl-content visible">
                         <table>
                             <tbody>{tableRows}</tbody>
                         </table>
