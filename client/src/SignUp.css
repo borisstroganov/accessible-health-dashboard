@@ -6,7 +6,7 @@
 }
 
 .sign-up-card {
-    background-color: #5A5A5A;
+    background-color: var(--section-bg-color);
     border-radius: 20px;
     height: 100%;
     width: 20vw;

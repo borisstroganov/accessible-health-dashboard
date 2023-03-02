@@ -9,7 +9,7 @@
     align-items: center;
     border: 2px solid;
     border-radius: 20px;
-    background-color: #5A5A5A;
+    background-color: var(--section-bg-color);
 }
 
 .input-wrapper {

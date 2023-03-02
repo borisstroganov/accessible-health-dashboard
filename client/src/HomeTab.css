@@ -10,11 +10,11 @@
     height: 160px;
     padding: 1em;
     margin: 0.1em;
-    border: 2px solid;
+    border: 2px solid var(--border-color);
     border-radius: 20px;
-    background-color: #5A5A5A;
+    background-color: var(--section-bg-color);
 }
 
 .dashboard-card:hover {
-    border: 3px solid teal;
+    border: 3px solid var(--primary-color);
 }

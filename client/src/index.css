@@ -15,6 +15,26 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* Light color scheme */
+  --primary-color: #00B2A9;
+  --primary-hover-color: #008C84;
+  --secondary-color: #7F7F7F;
+  --text-color: #000000;
+  --border-color: #E5E5E5;
+  --section-bg-color: #F5F5F5;
+  --background-color: #FFFFFF;
+
+  /* Dark color scheme */
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  --primary-color: #7B1FA2;
+  --primary-hover-color: #9C27B0;
+  --secondary-color: #B9B9B9;
+  --text-color: #FFFFFF;
+  --border-color: #FFFFFF;
+  --section-bg-color: #5A5A5A;
+  --background-color: #242424;
 }
 
 a {
@@ -33,6 +53,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 h1 {
@@ -53,7 +75,8 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  
+  border-color: var(--primary-hover-color);
 }
 
 button:focus,
