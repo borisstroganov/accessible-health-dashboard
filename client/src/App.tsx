@@ -42,7 +42,11 @@ type Therapist = {
     email: string;
 }
 
-function App() {
+type AppProps = {
+    onBackClick: () => void;
+}
+
+function App({ onBackClick }: AppProps) {
     const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [signedUp, setSignedUp] = useState<boolean>(false);
     const [toggleModal, setToggleModal] = useState<boolean>(false);
@@ -275,6 +279,7 @@ function App() {
         setPageState("home");
         setInvitations([{ therapist: { therapistEmail: "", therapistName: "" } }]);
         resetMessages();
+        onBackClick();
     }
 
     let handleHrSubmit = async (hr: number) => {
@@ -434,8 +439,11 @@ function App() {
                                             : <AssignmentsTab onAttemptClick={handleAttemptClick}
                                                 onBackClick={() => setPageState("home")} assignments={assignments} />}
                 </div>
-                : signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
-                    : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}
+                : <>
+                    <button className="landing-page-button" onClick={onBackClick}>Logoped</button>
+                    {signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
+                        : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}
+                </>}
         </>
     )
 }

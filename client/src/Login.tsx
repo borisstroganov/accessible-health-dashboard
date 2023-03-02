@@ -12,6 +12,7 @@ function Login({ onClick, onSignUpClick }: LoginProps) {
 
     return (
         <div className="Login">
+            <div className="landing-page-subtitle">Patient Login</div>
             <div className="login-card">
                 <div className="login-input-container">
                     <div className="login-input">
