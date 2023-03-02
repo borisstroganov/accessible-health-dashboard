@@ -106,3 +106,18 @@ export function getAssignmentFeedback(assignmentId: string): string {
     `, [assignmentId]);
     return feedback[0].feedbackText;
 }
+
+export function setAssignmentFeedback(assignmentId: string, feedbackText: string): void {
+    exec(`
+        UPDATE assignment 
+        SET feedbackText = ?, status = ?
+        WHERE assignmentId = ?;
+    `, [feedbackText, "reviewed", assignmentId]);
+}
+
+export function deleteAssignment(assignmentId: string): void {
+    exec(`
+        DELETE FROM assignment
+        WHERE assignmentId = ? 
+    `, [assignmentId]);
+}

@@ -19,7 +19,9 @@ import {
     createAssignment, getUserAssignments, getTherapistAssignments, getAssignmentTitle, getAssignmentText,
     getAssignmentUserEmail, getAssignmentTherapistEmail, getAssignmentStatus, checkAssignment, setAssignmentSpeech,
     getAssignmentSpeechId,
-    getAssignmentFeedback
+    getAssignmentFeedback,
+    setAssignmentFeedback,
+    deleteAssignment
 } from './models/assignment';
 
 import * as types from "../../common/types";
@@ -667,6 +669,7 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
     }
 });
 
+// TODO: Services file
 app.post("/sendAssignment", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.SendAssignmentRequest> = {
         type: "object",
@@ -691,6 +694,10 @@ app.post("/sendAssignment", isTherapist, (req: Request, res: Response) => {
     if (!checkUserExists(userEmail)) {
         return res.status(400).json({
             message: "Patient with this email does not exist."
+        })
+    } else if (getUserTherapistEmail(userEmail) !== req.auth.email) {
+        return res.status(400).json({
+            message: "Patient assigned to a different therapist."
         })
     } else {
         createAssignment(userEmail, req.auth.email, assignmentTitle, assignmentText)
@@ -752,6 +759,56 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
     }
 });
 
+// TODO: Services file
+app.get("/getTherapistAssignments", isTherapist, (req, res) => {
+    const assignmentIds = getTherapistAssignments(req.auth.email as string);
+    if (assignmentIds) {
+        const assignments = assignmentIds.map(assignment => {
+            const userEmail = getAssignmentUserEmail(assignment.assignmentId);
+            const userName = getUserName(userEmail);
+            const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
+            const assignmentText = getAssignmentText(assignment.assignmentId);
+            const status = getAssignmentStatus(assignment.assignmentId);
+            let speech: { wpm: number, accuracy: number } = { wpm: 0, accuracy: 0 };
+            if (status !== "todo") {
+                speech = retrieveSpeechById(getAssignmentSpeechId(assignment.assignmentId));
+            }
+            let feedbackText: string = ""
+            if (status === "reviewed") {
+                feedbackText = getAssignmentFeedback(assignment.assignmentId);
+            }
+            return {
+                assignment: {
+                    assignmentId: assignment.assignmentId,
+                    userName: userName,
+                    userEmail: userEmail,
+                    assignmentTitle: assignmentTitle,
+                    assignmentText: assignmentText,
+                    status: status, speech: speech,
+                    feedbackText: feedbackText
+                }
+            };
+        });
+
+        res.json({ assignments: assignments } as types.GetTherapistAssignmentsResponse);
+    } else {
+        res.json({
+            assignments: [
+                {
+                    assignment: {
+                        assignmentId: "",
+                        userName: "",
+                        userEmail: "",
+                        assignmentTitle: "",
+                        assignmentText: "",
+                        status: ""
+                    }
+                }
+            ]
+        } as types.GetTherapistAssignmentsResponse);
+    }
+});
+
 app.post("/submitAssignment", isLoggedIn, (req, res) => {
     const schema: JSONSchemaType<types.SubmitAssignmentRequest> = {
         type: "object",
@@ -784,7 +841,7 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
         })
     } else if (getAssignmentUserEmail(assignmentId) !== req.auth.email) {
         return res.status(400).json({
-            message: "Assignment assigned to different user."
+            message: "Assignment assigned to a different user."
         })
     } else if (getAssignmentStatus(assignmentId) !== "created") {
         return res.status(400).json({
@@ -794,7 +851,6 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
 
     let date = captureSpeech(req.auth.email, wpm, accuracy);
     let speech = retrieveSpeech(req.auth.email);
-    console.log(speech.speechId)
     setAssignmentSpeech(assignmentId, speech.speechId);
     res.json({
         email: req.auth.email,
@@ -802,7 +858,95 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
         accuracy: accuracy,
         date: date
     } as types.SubmitAssignmentResponse)
-})
+});
+
+// TODO: Services file
+app.post("/reviewAssignment", isTherapist, (req, res) => {
+    const schema: JSONSchemaType<types.ReviewAssignmentRequest> = {
+        type: "object",
+        properties: {
+            assignmentId: { type: "string" },
+            feedbackText: { type: "string" },
+        },
+        required: ["assignmentId", "feedbackText"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const {
+        assignmentId,
+        feedbackText
+    } = req.body as types.ReviewAssignmentRequest;
+
+    if (!checkAssignment(assignmentId)) {
+        return res.status(400).json({
+            message: "Assignment with the following ID does not exist."
+        })
+    } else if (getAssignmentTherapistEmail(assignmentId) !== req.auth.email) {
+        return res.status(400).json({
+            message: "Assignment assigned to a different therapist."
+        })
+    } else if (getAssignmentStatus(assignmentId) === "reviewed") {
+        return res.status(400).json({
+            message: "Assignment has already been reviewed."
+        })
+    } else if (getAssignmentStatus(assignmentId) === "created") {
+        return res.status(400).json({
+            message: "Assignment has not yet been completed."
+        })
+    }
+
+    setAssignmentFeedback(assignmentId, feedbackText)
+    res.json({
+        assignmentId: assignmentId,
+        feedbackText: feedbackText,
+        status: getAssignmentStatus(assignmentId),
+    })
+});
+
+// TODO: Services file
+app.delete("/deleteAssignment", isTherapist, (req, res) => {
+    const schema: JSONSchemaType<types.deleteAssignmentRequest> = {
+        type: "object",
+        properties: {
+            assignmentId: { type: "string" },
+        },
+        required: ["assignmentId"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { assignmentId } = req.body as types.deleteAssignmentRequest;
+
+    if (!checkAssignment(assignmentId)) {
+        return res.status(400).json({
+            message: "Assignment with the following ID does not exist."
+        })
+    } else if (getAssignmentTherapistEmail(assignmentId) !== req.auth.email) {
+        return res.status(400).json({
+            message: "Assignment assigned to a different therapist."
+        })
+    }
+
+    deleteAssignment(assignmentId);
+    res.json({
+        message: "Assignment deleted.",
+    } as types.deleteAssignmentResponse)
+});
 
 createTables();
 app.listen(5000);

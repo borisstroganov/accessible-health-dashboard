@@ -204,6 +204,19 @@ export type GetUserAssignmentsResponse = {
     }[],
 }
 
+export type GetTherapistAssignmentsResponse = {
+    assignments: {
+        assignment: {
+            assignmentId: string, userName: string, userEmail: string, assignmentTitle: string, assignmentText: string,
+            status: string, speech: {
+                wpm: number,
+                accuracy: number
+            },
+            feedbackText: string,
+        }
+    }[],
+}
+
 export type SubmitAssignmentRequest = {
     assignmentId: string,
     wpm: number,
@@ -216,4 +229,23 @@ export type SubmitAssignmentResponse = {
     wpm: number,
     accuracy: number,
     date: string,
+}
+
+export type ReviewAssignmentRequest = {
+    assignmentId: string,
+    feedbackText: string,
+}
+
+export type ReviewAssignmentResponse = {
+    assignmentId: string,
+    feedbackText: string,
+    status: string,
+}
+
+export type deleteAssignmentRequest = {
+    assignmentId: string,
+}
+
+export type deleteAssignmentResponse = {
+    message: string,
 }
