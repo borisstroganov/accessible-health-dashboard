@@ -19,7 +19,7 @@ function Notification({ onClick, title, text, color }: NotificationProps) {
             </div>
         </div>
 
-        <button onClick={onClick} className="notification-button"><IoClose style={{ "color": "black" }} /></button>
+        <button onClick={onClick} className="notification-button"><IoClose style={{ color: color }} /></button>
     </div>
     )
 }

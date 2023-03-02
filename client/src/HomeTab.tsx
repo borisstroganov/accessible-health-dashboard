@@ -14,7 +14,7 @@ function HomeTab({ onClick, heartRate, bloodPressure, speechRate }: HomeTabProps
 
     return (
         <div className="home-tab">
-            <h1>Accessible Health Dashboard</h1>
+            <h1>Logoped Dashboard</h1>
             <div className="dashboard">
                 <div className="dashboard-card" onClick={() => onClick("hr")}>
                     <h2>Heart Rate <FaHeartbeat /></h2>

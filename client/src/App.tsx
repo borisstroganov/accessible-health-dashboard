@@ -53,6 +53,7 @@ function App({ onBackClick }: AppProps) {
     const [successMessage, setSuccessMessage] = useState("");
     const [warningMessage, setWarningMessage] = useState("");
     const [infoMessage, setInfoMessage] = useState("");
+    const [updateMessage, setUpdateMessage] = useState("");
 
     const [user, setUser] = useState<User>()
     const [therapist, setTherapist] = useState<Therapist>()
@@ -203,6 +204,7 @@ function App({ onBackClick }: AppProps) {
         setInfoMessage("");
         setSuccessMessage("");
         setWarningMessage("");
+        setUpdateMessage("");
     }
 
     let handleLogin = async (email: string, password: string) => {
@@ -294,10 +296,10 @@ function App({ onBackClick }: AppProps) {
         setPageState("home");
         if (response.hr >= 120) {
             setWarningMessage("Your recent heart rate capture is higher than the expected range. \
-            If your heart rate remains consistently high, please contact your GP.")
+            If your heart rate remains consistently high, please consult a healthcare professional.")
         } else if (response.hr <= 40) {
             setWarningMessage("Your recent heart rate capture is lower than the expected range. \
-            If your heart rate remains consistently low, please contact your GP.")
+            If your heart rate remains consistently low, please consult a healthcare professional.")
         }
     }
 
@@ -315,16 +317,16 @@ function App({ onBackClick }: AppProps) {
             });
         }
         setPageState("home");
-        if ((response.systolicPressure >= 140 && response.diastolicPressure >= 90)) {
+        if ((response.systolicPressure >= 140 || response.diastolicPressure >= 90)) {
             setWarningMessage("Your recent blood pressure capture is higher than the expected range. \
             High blood pressure is often related to unhealthy lifestyle habits, such as smoking, drinking too much alcohol, \
             being overweight and not exercising enough. \
-            If your blood pressure remains consistently high, please contact your GP.")
-        } else if (response.systolicPressure <= 90 && response.diastolicPressure <= 60) {
+            If your blood pressure remains consistently high, please consult a healthcare professional.")
+        } else if (response.systolicPressure <= 90 || response.diastolicPressure <= 60) {
             setWarningMessage("Your recent blood pressure capture is lower than the expected range. \
             Low blood pressure may be caused by some medicines as a side effect. \
             It can also be caused by a number of underlying conditions. \
-            If your blood pressure remains consistently low, please contact your GP.")
+            If your blood pressure remains consistently low, please consult a healthcare professional.")
         }
     }
 
@@ -357,7 +359,7 @@ function App({ onBackClick }: AppProps) {
                 ${Math.round(speechRate.wpm - response.wpm)}.`
             }
 
-            setInfoMessage(message);
+            setUpdateMessage(message);
             setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
         }
         retrieveAssignments();
@@ -415,9 +417,11 @@ function App({ onBackClick }: AppProps) {
                     text={successMessage} color="rgba(50, 205, 50, 0.95)" />
                     : pageState === "home" && (warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
                         text={warningMessage} color="rgba(255, 127, 80, 0.95)" />
-                        : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
-                            text={infoMessage} color="rgba(0, 128, 128, 0.95)" />
-                            : "")}
+                        : updateMessage ? <Notification onClick={() => setUpdateMessage("")} title="Update"
+                            text={updateMessage} color="rgba(207, 159, 255, 0.95)" />
+                            : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
+                                text={infoMessage} color="rgba(0, 128, 128, 0.95)" />
+                                : "")}
             {loggedIn ?
                 <div className="App">
                     <Navbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
