@@ -242,10 +242,10 @@ export type ReviewAssignmentResponse = {
     status: string,
 }
 
-export type deleteAssignmentRequest = {
+export type DeleteAssignmentRequest = {
     assignmentId: string,
 }
 
-export type deleteAssignmentResponse = {
+export type DeleteAssignmentResponse = {
     message: string,
 }

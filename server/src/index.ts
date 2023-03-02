@@ -669,7 +669,6 @@ app.post("/rejectInvitation", isLoggedIn, (req, res) => {
     }
 });
 
-// TODO: Services file
 app.post("/sendAssignment", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.SendAssignmentRequest> = {
         type: "object",
@@ -759,7 +758,6 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
     }
 });
 
-// TODO: Services file
 app.get("/getTherapistAssignments", isTherapist, (req, res) => {
     const assignmentIds = getTherapistAssignments(req.auth.email as string);
     if (assignmentIds) {
@@ -860,7 +858,6 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
     } as types.SubmitAssignmentResponse)
 });
 
-// TODO: Services file
 app.post("/reviewAssignment", isTherapist, (req, res) => {
     const schema: JSONSchemaType<types.ReviewAssignmentRequest> = {
         type: "object",
@@ -911,9 +908,8 @@ app.post("/reviewAssignment", isTherapist, (req, res) => {
     })
 });
 
-// TODO: Services file
 app.delete("/deleteAssignment", isTherapist, (req, res) => {
-    const schema: JSONSchemaType<types.deleteAssignmentRequest> = {
+    const schema: JSONSchemaType<types.DeleteAssignmentRequest> = {
         type: "object",
         properties: {
             assignmentId: { type: "string" },
@@ -930,7 +926,7 @@ app.delete("/deleteAssignment", isTherapist, (req, res) => {
         })
     }
 
-    const { assignmentId } = req.body as types.deleteAssignmentRequest;
+    const { assignmentId } = req.body as types.DeleteAssignmentRequest;
 
     if (!checkAssignment(assignmentId)) {
         return res.status(400).json({
@@ -945,7 +941,7 @@ app.delete("/deleteAssignment", isTherapist, (req, res) => {
     deleteAssignment(assignmentId);
     res.json({
         message: "Assignment deleted.",
-    } as types.deleteAssignmentResponse)
+    } as types.DeleteAssignmentResponse)
 });
 
 createTables();
