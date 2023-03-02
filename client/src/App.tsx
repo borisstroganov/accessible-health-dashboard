@@ -30,7 +30,6 @@ import { rejectInvitation } from './services/rejectInvitation'
 import { getUserAssignments } from './services/getUserAssignments'
 import { submitAssignment } from './services/submitAssignment'
 
-
 type User = {
     name: string;
     email: string;
@@ -214,7 +213,8 @@ function App({ onBackClick }: AppProps) {
             setErrorMessage(response.message);
             return;
         } else {
-            setErrorMessage("")
+            setErrorMessage("");
+            setSuccessMessage("");
             setLoggedIn(true);
             setUser({ email: response.email, name: response.name, password: password });
         }
@@ -442,7 +442,7 @@ function App({ onBackClick }: AppProps) {
                 : <>
                     <button className="landing-page-button" onClick={onBackClick}>Logoped</button>
                     {signedUp ? <SignUp onClick={handleSignUp} onBackClick={handleBackClick} />
-                        : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} />}
+                        : <Login onClick={handleLogin} onSignUpClick={() => setSignedUp(true)} role="patient" />}
                 </>}
         </>
     )

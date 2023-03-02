@@ -4,15 +4,16 @@ import './Login.css'
 type LoginProps = {
     onClick: (email: string, password: string) => void;
     onSignUpClick: () => void;
+    role: string;
 }
 
-function Login({ onClick, onSignUpClick }: LoginProps) {
+function Login({ onClick, onSignUpClick, role }: LoginProps) {
     const [emailValue, setEmailValue] = useState("");
     const [passwordValue, setPasswordValue] = useState("");
 
     return (
         <div className="Login">
-            <div className="landing-page-subtitle">Patient Login</div>
+            <div className="landing-page-subtitle">{role === "patient"? "Patient Login" : "Therapist Login"}</div>
             <div className="login-card">
                 <div className="login-input-container">
                     <div className="login-input">
