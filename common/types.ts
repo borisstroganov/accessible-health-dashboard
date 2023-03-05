@@ -144,6 +144,19 @@ export type RetrieveUserTherapistResponse = {
     therapistName: string
 }
 
+export type GetTherapistPatientsResponse = {
+    patients: {
+        patient: {
+            userEmail: string, userName: string, speech: {
+                speechId: string,
+                wpm: number,
+                accuracy: number,
+                date: string,
+            }
+        }
+    }[]
+}
+
 export type SendInvitationRequest = {
     userEmail: string
 }

@@ -1,21 +1,15 @@
 import { useState } from 'react';
-import Modal from './Modal'
 import './AccountTab.css'
 
 type AccountTabProps = {
     onClick: (currentPassword: string, newPassword: string, confirmNewPassword: string) => void;
     onBackClick: () => void;
-    onRemoveClick: () => void;
     onInvitationsClick: () => void;
     email: string;
     name: string;
-    therapistEmail: string;
-    therapistName: string;
-    invitationsNumber: number;
 }
 
-function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, email, name,
-    therapistEmail, therapistName, invitationsNumber }: AccountTabProps) {
+function AccountTab({ onClick, onBackClick, onInvitationsClick, email, name }: AccountTabProps) {
     const [currentPassword, setCurrentPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
@@ -23,7 +17,6 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
     const uppercaseRegex = /^(?=.*[A-Z])/;
     const lowercaseRegex = /^(?=.*[a-z])/;
     const numbersRegex = /^(?=.*\d)/;
-    const [toggleModal, setToggleModal] = useState<boolean>(false);
 
     let handleClick = () => {
         onClick(currentPassword, newPassword, confirmPassword);
@@ -34,9 +27,6 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
 
     return (
         <>
-            {toggleModal && <Modal onClick={onRemoveClick} onCancel={() => setToggleModal(false)}
-                headerText="Confirmation" bodyText={`Are you sure you want to remove your assigned therapist?`}
-                buttonText="Remove" buttonTextColor="orangered" />}
             <div className="account-tab">
                 <h1>Account</h1>
                 <button className="home-button" onClick={onBackClick}>Home</button>
@@ -46,17 +36,6 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
                         <div className="account-details-div">{name}</div>
                         <h3>Email: </h3>
                         <div className="account-details-div">{email}</div>
-                        <h3>Therapist: </h3>
-                        <div className="account-details-div">
-                            {therapistEmail ? `${therapistName} ${therapistEmail}` : "Unassigned"}
-                        </div>
-                        {therapistEmail ?
-                            <button type="button" className="account-remove-btn" onClick={() => setToggleModal(true)}>
-                                Remove Therapist
-                            </button> :
-                            <button type="button" className="account-invitations-btn" onClick={onInvitationsClick}>
-                                {`Invitations (${invitationsNumber})`}
-                            </button>}
                     </div>
                     <div className="account-password">
                         <div className="account-password-title">Change Password</div>

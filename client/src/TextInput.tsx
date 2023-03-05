@@ -20,7 +20,7 @@ function TextInput({ onClick, title, label }: TextInputProps) {
                 <h3>{title}</h3>
                 <div className="input-wrapper">
                     {label}
-                    <textarea className="text-input" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
+                    <textarea className="textarea-input" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
                 </div>
                 <button type="button" className="submit" onClick={() => setToggleModal(true)} disabled={!formValue}>Submit</button>
             </div>

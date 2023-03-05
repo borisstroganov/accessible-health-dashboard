@@ -78,3 +78,12 @@ export function getUserTherapistEmail(email: string): string {
 
     return user[0].therapistEmail;
 }
+
+export function getTherapistUsers(therapistEmail: string): {email: string}[] {
+    const users = query<{email: string}>(`
+        SELECT email
+        FROM user
+        WHERE therapistEmail = ?
+    `, [therapistEmail]);
+    return users;
+}

@@ -11,7 +11,8 @@ import { captureHr, retrieveHr } from './models/heartRate';
 import { captureSpeech, retrieveSpeech, retrieveSpeechById } from './models/speechRate';
 import {
     createUser, loginUser, checkUserExists, getUserName, changeUserPassword, addTherapist, removeTherapist,
-    getUserTherapistEmail
+    getUserTherapistEmail,
+    getTherapistUsers
 } from './models/user';
 import { createTherapist, loginTherapist, checkTherapistExists, changeTherapistPassword, getTherapistName } from './models/therapist';
 import { createInvitation, getUserInvitations, getTherapistInvitations, checkInvitation, deleteInvitation } from './models/invitation';
@@ -504,6 +505,26 @@ app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
             therapistEmail: "",
             therapistName: ""
         });
+    }
+});
+
+app.get("/getTherapistPatients", isTherapist, (req: Request, res: Response) => {
+    const patientEmails = getTherapistUsers(req.auth.email as string);
+    if (patientEmails) {
+        const patients = patientEmails.map((patient) => {
+            const patientName = getUserName(patient.email);
+            const speech = retrieveSpeech(patient.email);
+            return {
+                patient: {
+                    userEmail: patient.email, userName: patientName, speech: speech
+                }
+            }
+        })
+        res.json(
+            { patients: patients } as types.GetTherapistPatientsResponse
+        );
+    } else {
+
     }
 });
 

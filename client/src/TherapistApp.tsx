@@ -15,6 +15,10 @@ import { getTherapistAssignments } from './services/getTherapistAssignments'
 import TherapistAssignmentsTab from './TherapistAssignmentsTab'
 import ReviewTab from './ReviewTab'
 import { reviewAssignment } from './services/reviewAssignment'
+import TherapistAccountTab from './TherapistAccountTab'
+import { therapistChangePassword } from './services/therapistChangePassword'
+import { getTherapistPatients } from './services/getTherapistPatients'
+import { sendInvitation } from './services/sendInvitation'
 
 type User = {
     name: string;
@@ -56,6 +60,18 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
     const [invitations, setInvitations] = useState<{ user: { userEmail: string, userName: string } }[]>(
         [{ user: { userEmail: "", userName: "" } }]
     );
+
+    const [patients, setPatients] = useState<{
+        patient: {
+            userEmail: string, userName: string, speech: {
+                speechId: string,
+                wpm: number,
+                accuracy: number,
+                date: string,
+            }
+        }
+    }[]>([{ patient: { userEmail: "", userName: "", speech: { speechId: "", wpm: 0, accuracy: 0, date: "" } } }])
+
     const [assignments, setAssignments] = useState<{
         assignment: {
             assignmentId: string, userName: string, userEmail: string, assignmentTitle: string,
@@ -75,6 +91,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         if (loggedIn) {
             retrieveInvitations()
             retrieveAssignments()
+            retrievePatients()
         }
     }, [user]);
 
@@ -83,7 +100,10 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             retrieveInvitations();
         } else if (pageState === "assignments") {
             retrieveAssignments();
-        } else if (pageState !== "review") {
+        } else if (pageState === "patients") {
+            retrievePatients();
+        }
+        else if (pageState !== "review") {
             setAssignmentText("");
             setAssignmentId("");
             setPatient({ name: "", email: "", });
@@ -112,6 +132,18 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             return;
         } else {
             setAssignments(response.assignments);
+        }
+    }
+
+    let retrievePatients = async () => {
+        let response = await getTherapistPatients(user?.email || "", user?.password || "")
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setPatients(response.patients);
         }
     }
 
@@ -158,6 +190,22 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         setSignedUp(false);
     }
 
+    let handleChangePassword = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+        if (newPassword !== confirmPassword) {
+            setErrorMessage("The confirmation password must match the new password.")
+            return
+        }
+        const response = await therapistChangePassword(user?.email || "", currentPassword, newPassword, confirmPassword)
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Password changed.");
+            setErrorMessage("");
+        }
+    }
+
     let handleLogOut = () => {
         setUser({ email: "", name: "", password: "" })
         setLoggedIn(false);
@@ -189,6 +237,18 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         setPageState("assignments");
     }
 
+    let handleSendInvitation = async (userEmail: string) => {
+        const response = await sendInvitation(user?.email || "", user?.password || "", userEmail)
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Invitation sent");
+        }
+        setPageState("patients");
+    }
+
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
@@ -206,13 +266,17 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                     {toggleModal && <Modal onClick={handleLogOut} onCancel={() => setToggleModal(false)} headerText="Logout"
                         bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
                     {pageState === "home" ? <TherapistHomeTab onClick={handleClick} />
-                        : pageState === "patients" ? <PatientsTab onSubmit={() => { }} onBackClick={() => setPageState("home")} />
-                            : pageState === "assignments" ? <TherapistAssignmentsTab onReviewClick={handleReviewClick}
-                                onBackClick={() => setPageState("home")} assignments={assignments} />
-                                : pageState === "review" ? <ReviewTab onClick={handleFeedbackSubmit}
-                                    onBackClick={() => setPageState("home")} assignmentId={assignmentId} assignmentText={assignmentText}
-                                    speech={speech} userName={patient?.name} userEmail={patient?.email} />
-                                    : ""}
+                        : pageState === "account" ? <TherapistAccountTab onClick={handleChangePassword}
+                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
+                            onInvitationsClick={() => { setPageState("invitations") }} />
+                            : pageState === "patients" ? <PatientsTab onSubmit={handleSendInvitation}
+                                onBackClick={() => setPageState("home")} patients={patients} />
+                                : pageState === "assignments" ? <TherapistAssignmentsTab onReviewClick={handleReviewClick}
+                                    onBackClick={() => setPageState("home")} assignments={assignments} />
+                                    : pageState === "review" ? <ReviewTab onClick={handleFeedbackSubmit}
+                                        onBackClick={() => setPageState("home")} assignmentId={assignmentId} assignmentText={assignmentText}
+                                        speech={speech} userName={patient?.name} userEmail={patient?.email} />
+                                        : ""}
                 </div>
                 : <>
                     <button className="landing-page-button" onClick={onBackClick}>Logoped</button>
