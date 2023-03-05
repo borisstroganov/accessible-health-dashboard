@@ -18,7 +18,6 @@ function SpeechTab({ onSubmit, onBackClick, assignmentText, assignmentId }: Spee
     he noticed that the castle was surrounded by a large wall. He flew around the wall and noticed a small opening. \
     He flew through the opening and landed in the castle courtyard.");
     const [transcription, setTranscription] = useState('')
-    console.log(assignmentText)
 
     let handleSubmit = (wpm: number, accuracy: number) => {
         onSubmit(wpm, accuracy, assignmentText ? "assignment" : "default", assignmentId ? assignmentId : "")

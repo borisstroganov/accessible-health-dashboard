@@ -103,7 +103,7 @@ function App({ onBackClick }: AppProps) {
             retrieveInvitations()
             retrieveAssignments()
         }
-    }, [user])
+    }, [user]);
 
     useEffect(() => {
         if (pageState === "account" || pageState === "invitations") {
@@ -114,7 +114,7 @@ function App({ onBackClick }: AppProps) {
             setAssignmentText("");
             setAssignmentId("");
         }
-    }, [pageState])
+    }, [pageState]);
 
     useEffect(() => {
         if (loggedIn && (!heartRate.hr || !bloodPressure.systolicPressure || !speechRate.wpm)) {
@@ -122,7 +122,7 @@ function App({ onBackClick }: AppProps) {
         } else {
             setInfoMessage("")
         }
-    }, [heartRate, bloodPressure, speechRate])
+    }, [heartRate, bloodPressure, speechRate]);
 
     let retrieveBp = async () => {
         let response = await latestBp(user?.email || "", user?.password || "");
@@ -404,8 +404,8 @@ function App({ onBackClick }: AppProps) {
     }
 
     let handleAttemptClick = (assignmentId: string, assignmentText: string) => {
-        setAssignmentText(assignmentText);
         setAssignmentId(assignmentId);
+        setAssignmentText(assignmentText);
         setPageState("speech");
     }
 

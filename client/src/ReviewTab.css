@@ -1,0 +1,26 @@
+.review-tab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.review-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.assignment-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 600px;
+    height: 400px;
+    padding: 10px;
+    margin: 2px;
+    border: 2px solid;
+    border-radius: 20px;
+    background-color: var(--section-bg-color);
+}

@@ -1,0 +1,35 @@
+.form-wrapper {
+    width: 330px;
+    height: 100%;
+    padding: 1em;
+    margin: 0.1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid;
+    border-radius: 20px;
+    background-color: var(--section-bg-color);
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-input {
+    padding: 10px;
+    height: 235px;
+    min-height: 100px;
+    max-height: 350px;
+    width: 250px;
+    margin: 0.1em;
+    text-align: left;
+    font-weight: bold;
+    border-radius: 20px;
+    white-space: pre-line;
+    overflow-y: auto;
+    resize: vertical;
+}

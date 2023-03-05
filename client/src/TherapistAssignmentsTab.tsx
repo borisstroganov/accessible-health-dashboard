@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import './AssignmentsTab.css'
+// import './TherapistAssignmentsTab.css'
 
-type AssignmentsTabProps = {
-    onAttemptClick: (assignmentId: string, assignmentText: string) => void;
+type TherapistAssignmentsTabProps = {
+    onReviewClick: (assignmentId: string, assignmentText: string, speech: { wpm: number, accuracy: number },
+        patient: { name: string, email: string }) => void;
     onBackClick: () => void;
     assignments: {
         assignment: {
-            assignmentId: string, therapistName: string, therapistEmail: string, assignmentTitle: string,
+            assignmentId: string, userName: string, userEmail: string, assignmentTitle: string,
             assignmentText: string, status: string, speech: {
                 wpm: number,
                 accuracy: number
@@ -15,7 +16,7 @@ type AssignmentsTabProps = {
     }[],
 }
 
-function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: AssignmentsTabProps) {
+function TherapistAssignmentsTab({ onReviewClick, onBackClick, assignments }: TherapistAssignmentsTabProps) {
     const [tableVisibility, setTableVisibility] = useState<{ [key: string]: boolean }>({
         todo: false,
         completed: false,
@@ -50,17 +51,18 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
     const completedRows: JSX.Element[] = [];
     const reviewedRows: JSX.Element[] = [];
 
-    assignments.forEach(({ assignment: { assignmentId, therapistName, therapistEmail,
+    assignments.forEach(({ assignment: { assignmentId, userName, userEmail,
         assignmentTitle, assignmentText, status, speech, feedbackText } }) => {
         const row = (
             <>
                 <tr key={assignmentId} onClick={() => handleRowClick(assignmentId)}>
                     <td>{assignmentTitle}</td>
-                    <td>{therapistName}</td>
-                    <td>{therapistEmail}</td>
+                    <td>{userName}</td>
+                    <td>{userEmail}</td>
                     <td>
-                        <button disabled={status !== "todo"} className="assignments-view-btn"
-                            onClick={() => onAttemptClick(assignmentId, assignmentText)}>Attempt</button>
+                        <button disabled={status !== "completed"} className="assignments-view-btn"
+                            onClick={() => onReviewClick(assignmentId, assignmentText, speech,
+                                { name: userName, email: userEmail })}>Review</button>
                     </td>
                 </tr>
                 {expandedRows.includes(assignmentId) && (
@@ -101,9 +103,10 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
 
     return (
         <div className="assignments-tab">
-            <h1>My Assignments</h1>
+            <h1>All Assignments</h1>
             <button className="home-button" onClick={onBackClick}>Home</button>
-            <div className="assignments-table-label" onClick={() => handleTableToggle("todo")}>Current Assignments ({todoRows.length})</div>
+            <div className="assignments-table-label" onClick={() => handleTableToggle("todo")}>Unattempted Assignments
+                ({todoRows.length})</div>
             {todoRows.length ?
                 <div className={`tbl-full ${tableVisibility.todo ? 'visible' : ''}`}>
                     <div className={`tbl-header ${tableVisibility.todo ? 'visible' : ''}`}>
@@ -111,8 +114,8 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                             <thead>
                                 {tableVisibility.todo && <tr>
                                     <th>Assignment Title</th>
-                                    <th>Therapist Name</th>
-                                    <th>Therapist Email</th>
+                                    <th>Patient Name</th>
+                                    <th>Patient Email</th>
                                     <th>Actions</th>
                                 </tr>}
                             </thead>
@@ -124,7 +127,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                         </table>
                     </div>
                 </div>
-                : <div className={`tbl-empty ${tableVisibility.todo ? 'visible' : ''}`}>No Current Assignments.</div>}
+                : <div className={`tbl-empty ${tableVisibility.todo ? 'visible' : ''}`}>No Unattempted Assignments.</div>}
             <div className="assignments-table-label" onClick={() => handleTableToggle("completed")}>Completed Assignments
                 ({completedRows.length})</div>
             {completedRows.length ?
@@ -134,8 +137,8 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                             <thead>
                                 {tableVisibility.completed && <tr>
                                     <th>Assignment Title</th>
-                                    <th>Therapist Name</th>
-                                    <th>Therapist Email</th>
+                                    <th>Patient Name</th>
+                                    <th>Patient Email</th>
                                     <th>Actions</th>
                                 </tr>}
                             </thead>
@@ -157,8 +160,8 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                             <thead>
                                 {tableVisibility.reviewed && <tr>
                                     <th>Assignment Title</th>
-                                    <th>Therapist Name</th>
-                                    <th>Therapist Email</th>
+                                    <th>Patient Name</th>
+                                    <th>Patient Email</th>
                                     <th>Actions</th>
                                 </tr>}
                             </thead>
@@ -174,4 +177,4 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
         </div>
     )
 }
-export default AssignmentsTab
+export default TherapistAssignmentsTab
