@@ -263,6 +263,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             setSuccessMessage("Invitation sent.");
         }
         setPageState("patients");
+        retrieveInvitations();
     }
 
     let handleCreateAssignment = async (userEmail: string, assignmentTitle: string, assignmentText: string) => {
@@ -293,7 +294,10 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                     <TherapistNavbar onClick={handleClick} onLogOut={() => setToggleModal(true)} name={user?.name || ""} />
                     {toggleModal && <Modal onClick={handleLogOut} onCancel={() => setToggleModal(false)} headerText="Logout"
                         bodyText="Are you sure you want to logout?" buttonText="Logout" buttonTextColor="orangered" />}
-                    {pageState === "home" ? <TherapistHomeTab onClick={handleClick} />
+                    {pageState === "home" ? <TherapistHomeTab onClick={handleClick} patientsNumber={patients.length}
+                        invitationsNumber={invitations.length} unattemptedNumber={assignments.filter((item) =>
+                            item.assignment.status === "todo").length} completedNumber={assignments.filter((item) =>
+                                item.assignment.status === "completed").length} />
                         : pageState === "account" ? <TherapistAccountTab onClick={handleChangePassword}
                             onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
                             onInvitationsClick={() => { setPageState("invitations") }} />
