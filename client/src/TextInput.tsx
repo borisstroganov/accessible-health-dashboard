@@ -18,7 +18,7 @@ function TextInput({ onClick, title, label }: TextInputProps) {
                 bodyText={`Are you sure you want to submit?`} buttonText="Submit" buttonTextColor="limegreen" />}
             <div className="form-wrapper">
                 <h3>{title}</h3>
-                <div className="input-wrapper">
+                <div className="textarea-input-wrapper">
                     {label}
                     <textarea className="textarea-input" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
                 </div>

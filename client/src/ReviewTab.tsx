@@ -30,7 +30,7 @@ function ReviewTab({ onClick, onBackClick, assignmentId, assignmentText, speech,
                         <h3>Assignment Text:</h3>
                         {assignmentText}
                     </div>
-                    <h3>Submission: {speech.wpm} WPM, {speech.accuracy} Accuracy</h3>
+                    <h3>Submission: {Math.round(speech.wpm)} WPM, {Math.round(speech.accuracy)} Accuracy</h3>
                 </div>
                 <TextInput onClick={handleClick} title="Feedback:" label="Please type your feedback here." />
             </div>
