@@ -1,4 +1,4 @@
-.form-wrapper {
+.textarea-form-wrapper {
     width: 350px;
     height: 100%;
     padding: 1em;
@@ -12,7 +12,7 @@
     background-color: var(--section-bg-color);
 }
 
-.input-wrapper {
+.textarea-input-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: center;

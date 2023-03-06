@@ -895,7 +895,7 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
         return res.status(400).json({
             message: "Assignment assigned to a different user."
         })
-    } else if (getAssignmentStatus(assignmentId) !== "created") {
+    } else if (getAssignmentStatus(assignmentId) !== "todo") {
         return res.status(400).json({
             message: "Assignment has already been completed."
         })

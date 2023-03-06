@@ -57,9 +57,9 @@ function CreateAssignmentTab({ onClick, onBackClick, patients }: CreateAssignmen
                     </div>
                 </div>
                 <div>
-                    <div className="form-wrapper">
+                    <div className="textarea-form-wrapper">
                         <div className="create-label">Assignment Text:</div>
-                        <div className="input-wrapper">
+                        <div className="textarea-input-wrapper">
                             <textarea className="textarea-input" value={assignmentText} onChange={(e) => setAssignmentText(e.target.value)} />
                         </div>
                     </div>
