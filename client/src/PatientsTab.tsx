@@ -5,6 +5,7 @@ import './PatientsTab.css'
 type PatientsTabProps = {
     onSubmit: (userEmail: string) => void;
     onBackClick: () => void;
+    onRemove: (userEmail: string) => void;
     patients: {
         patient: {
             userEmail: string;
@@ -19,7 +20,7 @@ type PatientsTabProps = {
     }[]
 }
 
-function PatientsTab({ onSubmit, onBackClick, patients }: PatientsTabProps) {
+function PatientsTab({ onSubmit, onBackClick, onRemove, patients }: PatientsTabProps) {
     const [formValue, setFormValue] = useState("");
     const [toggleModal, setToggleModal] = useState<boolean>(false);
 
@@ -29,7 +30,7 @@ function PatientsTab({ onSubmit, onBackClick, patients }: PatientsTabProps) {
             <td>{userEmail}</td>
             <td>WPM:{Math.round(speech.wpm)}, Accuracy:{Math.round(speech.accuracy)}</td>
             <td>
-                <button className="invitation-accept-btn" onClick={() => { }}>Remove</button>
+                <button className="invitation-accept-btn" onClick={() => onRemove(userEmail)}>Remove</button>
             </td>
         </tr>
     ));

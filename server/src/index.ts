@@ -493,6 +493,39 @@ app.patch("/removeTherapist", isLoggedIn, (req, res) => {
     }
 });
 
+app.patch("/removePatient", isTherapist, (req, res) => {
+    const schema: JSONSchemaType<types.RemovePatientRequest> = {
+        type: "object",
+        properties: {
+            userEmail: { type: "string", format: "email" },
+        },
+        required: ["userEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.body);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { userEmail } = req.body as types.RemovePatientRequest;
+
+    if (getUserTherapistEmail(userEmail) !== req.auth.email) {
+        return res.status(400).json({
+            message: "Patient has not been assigned to you."
+        })
+    } else {
+        removeTherapist(userEmail)
+        return res.json({
+            email: req.auth.email,
+        } as types.RemovePatientResponse)
+    }
+
+});
+
 app.get("/retrieveUserTherapist", isLoggedIn, (req: Request, res: Response) => {
     const therapistEmail = getUserTherapistEmail(req.auth.email as string);
     if (therapistEmail) {

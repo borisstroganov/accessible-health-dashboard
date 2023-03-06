@@ -129,6 +129,14 @@ export type RemoveTherapistResponse = {
     email: string,
 }
 
+export type RemovePatientRequest = {
+    userEmail: string,
+}
+
+export type RemovePatientResponse = {
+    email: string,
+}
+
 export type TherapistChangePasswordRequest = {
     password: string,
     newPassword: string,

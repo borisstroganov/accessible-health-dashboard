@@ -21,6 +21,7 @@ import { getTherapistPatients } from './services/getTherapistPatients'
 import { sendInvitation } from './services/sendInvitation'
 import CreateAssignmentTab from './CreateAssignmentTab'
 import { sendAssignment } from './services/sendAssignment'
+import { removePatient } from './services/removePatient'
 
 type User = {
     name: string;
@@ -217,6 +218,19 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         onBackClick();
     }
 
+    let handleRemove = async (userEmail: string) => {
+        const response = await removePatient(user?.email || "", user?.password || "", userEmail)
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Patient removed.");
+        }
+        retrievePatients();
+    }
+
     let handleReviewClick = (assignmentId: string, assignmentText: string, speech: { wpm: number, accuracy: number },
         patient: { name: string, email: string }) => {
         setAssignmentId(assignmentId);
@@ -234,7 +248,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             setErrorMessage(response.message);
             return;
         } else {
-            setSuccessMessage("Feedback submitted");
+            setSuccessMessage("Feedback submitted.");
         }
         setPageState("assignments");
     }
@@ -246,7 +260,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             setErrorMessage(response.message);
             return;
         } else {
-            setSuccessMessage("Invitation sent");
+            setSuccessMessage("Invitation sent.");
         }
         setPageState("patients");
     }
@@ -258,7 +272,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             setErrorMessage(response.message);
             return;
         } else {
-            setSuccessMessage("Assignment sent");
+            setSuccessMessage("Assignment sent.");
         }
         setPageState("assignments");
     }
@@ -284,7 +298,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                             onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
                             onInvitationsClick={() => { setPageState("invitations") }} />
                             : pageState === "patients" ? <PatientsTab onSubmit={handleSendInvitation}
-                                onBackClick={() => setPageState("home")} patients={patients} />
+                                onBackClick={() => setPageState("home")} onRemove={handleRemove} patients={patients} />
                                 : pageState === "assignments" ? <TherapistAssignmentsTab onReviewClick={handleReviewClick}
                                     onBackClick={() => setPageState("home")} onNewClick={() => setPageState("create")}
                                     assignments={assignments} />
