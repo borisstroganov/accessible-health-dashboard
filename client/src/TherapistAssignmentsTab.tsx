@@ -1,10 +1,12 @@
 import { useState } from 'react';
-// import './TherapistAssignmentsTab.css'
+import { AiOutlinePlusCircle } from 'react-icons/ai';
+import './TherapistAssignmentsTab.css'
 
 type TherapistAssignmentsTabProps = {
     onReviewClick: (assignmentId: string, assignmentText: string, speech: { wpm: number, accuracy: number },
         patient: { name: string, email: string }) => void;
     onBackClick: () => void;
+    onNewClick: () => void;
     assignments: {
         assignment: {
             assignmentId: string, userName: string, userEmail: string, assignmentTitle: string,
@@ -16,7 +18,7 @@ type TherapistAssignmentsTabProps = {
     }[],
 }
 
-function TherapistAssignmentsTab({ onReviewClick, onBackClick, assignments }: TherapistAssignmentsTabProps) {
+function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assignments }: TherapistAssignmentsTabProps) {
     const [tableVisibility, setTableVisibility] = useState<{ [key: string]: boolean }>({
         todo: false,
         completed: false,
@@ -105,6 +107,10 @@ function TherapistAssignmentsTab({ onReviewClick, onBackClick, assignments }: Th
         <div className="assignments-tab">
             <h1>All Assignments</h1>
             <button className="home-button" onClick={onBackClick}>Home</button>
+            <button className="create-assignment-button" onClick={onNewClick}><AiOutlinePlusCircle style={{
+                fontSize: "120%",
+                transform: "translateY(4px)"
+            }} /> New Assignment</button>
             <div className="assignments-table-label" onClick={() => handleTableToggle("todo")}>Unattempted Assignments
                 ({todoRows.length})</div>
             {todoRows.length ?

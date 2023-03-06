@@ -19,6 +19,8 @@ import TherapistAccountTab from './TherapistAccountTab'
 import { therapistChangePassword } from './services/therapistChangePassword'
 import { getTherapistPatients } from './services/getTherapistPatients'
 import { sendInvitation } from './services/sendInvitation'
+import CreateAssignmentTab from './CreateAssignmentTab'
+import { sendAssignment } from './services/sendAssignment'
 
 type User = {
     name: string;
@@ -249,6 +251,18 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         setPageState("patients");
     }
 
+    let handleCreateAssignment = async (userEmail: string, assignmentTitle: string, assignmentText: string) => {
+        const response = await sendAssignment(user?.email || "", user?.password || "", userEmail, assignmentTitle, assignmentText);
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Assignment sent");
+        }
+        setPageState("assignments");
+    }
+
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
@@ -272,11 +286,14 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                             : pageState === "patients" ? <PatientsTab onSubmit={handleSendInvitation}
                                 onBackClick={() => setPageState("home")} patients={patients} />
                                 : pageState === "assignments" ? <TherapistAssignmentsTab onReviewClick={handleReviewClick}
-                                    onBackClick={() => setPageState("home")} assignments={assignments} />
+                                    onBackClick={() => setPageState("home")} onNewClick={() => setPageState("create")}
+                                    assignments={assignments} />
                                     : pageState === "review" ? <ReviewTab onClick={handleFeedbackSubmit}
                                         onBackClick={() => setPageState("home")} assignmentId={assignmentId} assignmentText={assignmentText}
                                         speech={speech} userName={patient?.name} userEmail={patient?.email} />
-                                        : ""}
+                                        : pageState === "create" ? <CreateAssignmentTab onClick={handleCreateAssignment}
+                                            onBackClick={() => setPageState("home")} patients={patients} />
+                                            : ""}
                 </div>
                 : <>
                     <button className="landing-page-button" onClick={onBackClick}>Logoped</button>

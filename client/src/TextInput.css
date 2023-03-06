@@ -1,5 +1,5 @@
 .form-wrapper {
-    width: 330px;
+    width: 350px;
     height: 100%;
     padding: 1em;
     margin: 0.1em;
@@ -24,7 +24,7 @@
     height: 235px;
     min-height: 100px;
     max-height: 350px;
-    width: 250px;
+    width: 300px;
     margin: 0.1em;
     text-align: left;
     font-weight: bold;
