@@ -70,7 +70,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                                 <h3>Assignment Text:</h3>
                                 {assignmentText}
                                 {(status === "completed" || status === "reviewed") &&
-                                    <h3>Submission: {speech.wpm} WPM, {speech.accuracy} Accuracy</h3>
+                                    <h3>Submission: {Math.round(speech.wpm)} WPM, {Math.round(speech.accuracy)} Accuracy</h3>
                                 }
                                 {status === "reviewed" &&
                                     <>
