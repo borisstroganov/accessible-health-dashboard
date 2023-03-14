@@ -29,6 +29,7 @@ import { getUserInvitations } from './services/getUserInvitations'
 import { rejectInvitation } from './services/rejectInvitation'
 import { getUserAssignments } from './services/getUserAssignments'
 import { submitAssignment } from './services/submitAssignment'
+import { retrieveHrs } from './services/retrieveHrs'
 
 type User = {
     name: string;
@@ -89,6 +90,7 @@ function App({ onBackClick }: AppProps) {
         accuracy: 0,
         date: "",
     });
+    const [pastHrs, setPastHrs] = useState<{ hrCapture: { hr: number, date: string, } }[]>([{ hrCapture: { hr: 0, date: "" } }]);
     const [assignmentText, setAssignmentText] = useState<string>("")
     const [assignmentId, setAssignmentId] = useState<string>("")
 
@@ -102,6 +104,7 @@ function App({ onBackClick }: AppProps) {
             retrieveTherapist()
             retrieveInvitations()
             retrieveAssignments()
+            retrievePastHrs()
         }
     }, [user]);
 
@@ -110,6 +113,8 @@ function App({ onBackClick }: AppProps) {
             retrieveInvitations();
         } else if (pageState === "assignments") {
             retrieveAssignments();
+        } else if (pageState === "hr") {
+            retrievePastHrs();
         } else if (pageState !== "speech") {
             setAssignmentText("");
             setAssignmentId("");
@@ -145,6 +150,20 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setHeartRate(response)
+        }
+    }
+
+    let retrievePastHrs = async () => {
+        let response = await retrieveHrs(user?.email || "", user?.password || "");
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            console.log(pastHrs)
+            setPastHrs(response.hrs);
+            console.log(response.hrs)
         }
     }
 
@@ -434,7 +453,8 @@ function App({ onBackClick }: AppProps) {
                             therapistEmail={therapist?.email || ""} therapistName={therapist?.name || ""}
                             onRemoveClick={handleRemoveTherapist} onInvitationsClick={() => { setPageState("invitations") }}
                             invitationsNumber={invitations.length} />
-                            : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")} />
+                            : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")}
+                                previousCaptures={pastHrs} />
                                 : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
                                         onBackClick={() => setPageState("home")} assignmentText={assignmentText}

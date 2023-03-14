@@ -85,6 +85,10 @@ export type LatestSpeechResponse = {
     date: string,
 }
 
+export type RetrieveHrsResponse = {
+    hrs: { hrCapture: { hr: number, date: string, } }[]
+}
+
 export type ChangePasswordRequest = {
     password: string,
     newPassword: string,

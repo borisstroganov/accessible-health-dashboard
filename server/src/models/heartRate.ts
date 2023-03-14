@@ -21,3 +21,13 @@ export function retrieveHr(email: string): { hr: number; date: string } {
     `, [email]);
     return hrs[0];
 }
+
+export function retrieveAllHr(email: string): { hr: number; date: string }[] {
+    const hrs = query<{ hr: number; date: string }>(`
+        SELECT hr, date
+        FROM heartRate
+        WHERE userEmail = ?
+        ORDER BY date ASC;
+    `, [email])
+    return hrs;
+}

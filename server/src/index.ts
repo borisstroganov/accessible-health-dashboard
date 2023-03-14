@@ -7,7 +7,7 @@ import bAuth from "basic-auth";
 
 import { createTables } from './db';
 import { captureBp, retrieveBp } from './models/bloodPressure';
-import { captureHr, retrieveHr } from './models/heartRate';
+import { captureHr, retrieveHr, retrieveAllHr } from './models/heartRate';
 import { captureSpeech, retrieveSpeech, retrieveSpeechById } from './models/speechRate';
 import {
     createUser, loginUser, checkUserExists, getUserName, changeUserPassword, addTherapist, removeTherapist,
@@ -326,6 +326,29 @@ app.get("/latestSpeech", isLoggedIn, (req: Request, res: Response) => {
             accuracy: 0,
             date: ""
         });
+    }
+});
+
+app.get("/retrieveHrs", isLoggedIn, (req: Request, res: Response) => {
+    const hr = retrieveAllHr(req.auth.email as string);
+    if (hr) {
+        res.json({
+            hrs: hr.map(item => ({
+                hrCapture: {
+                    hr: item.hr,
+                    date: item.date
+                }
+            }))
+        } as types.RetrieveHrsResponse);
+    } else {
+        res.json({
+            hrs: [{
+                hrCapture: {
+                    hr: 0,
+                    date: ""
+                }
+            }]
+        } as types.RetrieveHrsResponse);
     }
 });
 
