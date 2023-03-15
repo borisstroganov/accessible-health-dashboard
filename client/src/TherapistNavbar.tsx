@@ -5,10 +5,20 @@ type TherapistNavbarProps = {
 }
 
 function TherapistNavbar({ onClick, onLogOut, name }: TherapistNavbarProps) {
+
+    function getGreeting() {
+        const hour = new Date().getHours();
+        return hour < 12
+            ? "Good morning"
+            : hour < 18
+                ? "Good afternoon"
+                : "Good evening";
+    }
+
     return (
         <div className="navbar">
             <div className="dashboard-title">
-                <h3 style={{ fontSize: "140%" }} onClick={() => onClick("home")}>Hello {name}!</h3>
+                <h3 style={{ fontSize: "140%" }} onClick={() => onClick("home")}>{getGreeting()}, {name}!</h3>
             </div>
             <ul>
                 <li>
