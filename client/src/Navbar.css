@@ -1,5 +1,5 @@
 .navbar {
-    position: absolute;
+    position: sticky;
     width: 100%;
     top: 0;
     background-color: grey;
@@ -8,6 +8,7 @@
     justify-content: space-between;
     align-items: stretch;
     padding: 0 1rem;
+    z-index: 1;
 }
 
 .navbar ul {

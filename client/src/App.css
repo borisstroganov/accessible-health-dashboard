@@ -4,8 +4,13 @@
 
 #root {
   width: 100%;
+  height: 100vh;
   margin: 0 auto;
   text-align: center;
+}
+.App {
+  height: 100vh;
+  justify-content: center;
 }
 
 .home-button {

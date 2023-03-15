@@ -6,9 +6,9 @@ import addFormats from "ajv-formats";
 import bAuth from "basic-auth";
 
 import { createTables } from './db';
-import { captureBp, retrieveBp } from './models/bloodPressure';
+import { captureBp, retrieveAllBp, retrieveBp } from './models/bloodPressure';
 import { captureHr, retrieveHr, retrieveAllHr } from './models/heartRate';
-import { captureSpeech, retrieveSpeech, retrieveSpeechById } from './models/speechRate';
+import { captureSpeech, retrieveAllSpeech, retrieveSpeech, retrieveSpeechById } from './models/speechRate';
 import {
     createUser, loginUser, checkUserExists, getUserName, changeUserPassword, addTherapist, removeTherapist,
     getUserTherapistEmail,
@@ -349,6 +349,56 @@ app.get("/retrieveHrs", isLoggedIn, (req: Request, res: Response) => {
                 }
             }]
         } as types.RetrieveHrsResponse);
+    }
+});
+
+app.get("/retrieveBps", isLoggedIn, (req: Request, res: Response) => {
+    const bp = retrieveAllBp(req.auth.email as string);
+    if (bp) {
+        res.json({
+            bps: bp.map(item => ({
+                bpCapture: {
+                    systolicPressure: item.systolicPressure,
+                    diastolicPressure: item.diastolicPressure,
+                    date: item.date,
+                }
+            }))
+        } as types.RetrieveBpsResponse);
+    } else {
+        res.json({
+            bps: [{
+                bpCapture: {
+                    systolicPressure: 0,
+                    diastolicPressure: 0,
+                    date: ""
+                }
+            }]
+        } as types.RetrieveBpsResponse);
+    }
+});
+
+app.get("/retrieveSpeeches", isLoggedIn, (req: Request, res: Response) => {
+    const speech = retrieveAllSpeech(req.auth.email as string);
+    if (speech) {
+        res.json({
+            speeches: speech.map(item => ({
+                speechCapture: {
+                    wpm: item.wpm,
+                    accuracy: item.accuracy,
+                    date: item.date,
+                }
+            }))
+        } as types.RetrieveSpeechesResponse);
+    } else {
+        res.json({
+            speeches: [{
+                speechCapture: {
+                    wpm: 0,
+                    accuracy: 0,
+                    date: "",
+                }
+            }]
+        } as types.RetrieveSpeechesResponse);
     }
 });
 

@@ -21,3 +21,18 @@ export function retrieveBp(email: string): { systolicPressure: number; diastolic
     `, [email]);
     return bps[0];
 }
+
+export function retrieveAllBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string }[] {
+    const bps = query<{ systolicPressure: number; diastolicPressure: number; date: string }>(`
+        SELECT systolicPressure, diastolicPressure, date
+        FROM (
+            SELECT systolicPressure, diastolicPressure, date
+            FROM bloodPressure
+            WHERE userEmail = ?
+            ORDER BY date DESC
+            LIMIT 15
+        ) recent_blood_pressure
+        ORDER BY date ASC;
+    `, [email])
+    return bps;
+}

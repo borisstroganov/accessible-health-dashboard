@@ -82,7 +82,7 @@ function LineChart({ chartData, titleText }: LineChartProps) {
     };
 
     return (
-        <div className="line-chart" style={{ width: "700px", marginRight: "100px" }}>
+        <div className="line-chart" style={{ width: "700px" }}>
             <Line options={options} data={chartData} />
         </div>
     )

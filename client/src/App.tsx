@@ -30,6 +30,8 @@ import { rejectInvitation } from './services/rejectInvitation'
 import { getUserAssignments } from './services/getUserAssignments'
 import { submitAssignment } from './services/submitAssignment'
 import { retrieveHrs } from './services/retrieveHrs'
+import { retrieveBps } from './services/retrieveBps'
+import { retrieveSpeeches } from './services/retrieveSpeeches'
 
 type User = {
     name: string;
@@ -91,6 +93,11 @@ function App({ onBackClick }: AppProps) {
         date: "",
     });
     const [pastHrs, setPastHrs] = useState<{ hrCapture: { hr: number, date: string, } }[]>([{ hrCapture: { hr: 0, date: "" } }]);
+    const [pastBps, setPastBps] = useState<{ bpCapture: { systolicPressure: number, diastolicPressure: number, date: string, } }[]>
+        ([{ bpCapture: { systolicPressure: 0, diastolicPressure: 0, date: "" } }]);
+    const [pastSpeeches, setPastSpeeches] = useState<{ speechCapture: { wpm: number, accuracy: number, date: string, } }[]>
+        ([{ speechCapture: { wpm: 0, accuracy: 0, date: "" } }]);
+
     const [assignmentText, setAssignmentText] = useState<string>("")
     const [assignmentId, setAssignmentId] = useState<string>("")
 
@@ -105,6 +112,8 @@ function App({ onBackClick }: AppProps) {
             retrieveInvitations()
             retrieveAssignments()
             retrievePastHrs()
+            retrievePastBps()
+            retrievePastSpeeches()
         }
     }, [user]);
 
@@ -113,8 +122,6 @@ function App({ onBackClick }: AppProps) {
             retrieveInvitations();
         } else if (pageState === "assignments") {
             retrieveAssignments();
-        } else if (pageState === "hr") {
-            retrievePastHrs();
         } else if (pageState !== "speech") {
             setAssignmentText("");
             setAssignmentId("");
@@ -141,6 +148,18 @@ function App({ onBackClick }: AppProps) {
         }
     }
 
+    let retrievePastBps = async () => {
+        let response = await retrieveBps(user?.email || "", user?.password || "");
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setPastBps(response.bps);
+        }
+    }
+
     let retrieveHr = async () => {
         let response = await latestHr(user?.email || "", user?.password || "");
 
@@ -161,9 +180,7 @@ function App({ onBackClick }: AppProps) {
             setErrorMessage(response.message);
             return;
         } else {
-            console.log(pastHrs)
             setPastHrs(response.hrs);
-            console.log(response.hrs)
         }
     }
 
@@ -176,6 +193,18 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setSpeechRate(response)
+        }
+    }
+
+    let retrievePastSpeeches = async () => {
+        let response = await retrieveSpeeches(user?.email || "", user?.password || "");
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setPastSpeeches(response.speeches);
         }
     }
 
@@ -311,6 +340,7 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setHeartRate({ hr: response.hr, date: response.date });
+            retrievePastHrs();
         }
         setPageState("home");
         if (response.hr >= 120) {
@@ -334,6 +364,7 @@ function App({ onBackClick }: AppProps) {
                 diastolicPressure: response.diastolicPressure,
                 date: response.date
             });
+            retrievePastBps();
         }
         setPageState("home");
         if ((response.systolicPressure >= 140 || response.diastolicPressure >= 90)) {
@@ -351,7 +382,6 @@ function App({ onBackClick }: AppProps) {
 
     let handleSpeechSubmit = async (wpm: number, accuracy: number, type: string, assignmentId: string) => {
         let message = ""
-        console.log("type", type)
 
         const response = type === "default"
             ? await captureSpeech(user?.email || "", user?.password || "", wpm, accuracy)
@@ -380,6 +410,7 @@ function App({ onBackClick }: AppProps) {
 
             setUpdateMessage(message);
             setSpeechRate({ wpm: response.wpm, accuracy: response.accuracy, date: response.date });
+            retrievePastSpeeches();
         }
         retrieveAssignments();
         setPageState("home");
@@ -455,10 +486,11 @@ function App({ onBackClick }: AppProps) {
                             invitationsNumber={invitations.length} />
                             : pageState === "hr" ? <HrTab onClick={handleHrSubmit} onBackClick={() => setPageState("home")}
                                 previousCaptures={pastHrs} />
-                                : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")} />
+                                : pageState === "bp" ? <BpTab onClick={handleBpSubmit} onBackClick={() => setPageState("home")}
+                                    previousCaptures={pastBps} />
                                     : pageState === "speech" ? <SpeechTab onSubmit={handleSpeechSubmit}
                                         onBackClick={() => setPageState("home")} assignmentText={assignmentText}
-                                        assignmentId={assignmentId} />
+                                        assignmentId={assignmentId} previousCaptures={pastSpeeches} />
                                         : pageState === "invitations" ? <InvitationsTab onAcceptClick={handleAcceptClick} onRejectClick={handleRejectClick} onBackClick={() => setPageState("home")} invitations={invitations} />
                                             : <AssignmentsTab onAttemptClick={handleAttemptClick}
                                                 onBackClick={() => setPageState("home")} assignments={assignments} />}

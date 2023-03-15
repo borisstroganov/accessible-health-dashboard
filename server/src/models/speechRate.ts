@@ -23,10 +23,25 @@ export function retrieveSpeech(email: string): { speechId: string; wpm: number; 
 }
 
 export function retrieveSpeechById(speechId: string): { wpm: number; accuracy: number } {
-    const speech = query<{ wpm: number; accuracy: number}>(`
+    const speech = query<{ wpm: number; accuracy: number }>(`
         SELECT wpm, accuracy
         FROM speechRate
         WHERE speechId = ?
     `, [speechId]);
     return speech[0];
+}
+
+export function retrieveAllSpeech(email: string): { wpm: number; accuracy: number; date: string }[] {
+    const bps = query<{ wpm: number; accuracy: number; date: string }>(`
+        SELECT wpm, accuracy, date
+        FROM (
+            SELECT wpm, accuracy, date
+            FROM speechRate
+            WHERE userEmail = ?
+            ORDER BY date DESC
+            LIMIT 15
+        ) recent_speech_rates
+        ORDER BY date ASC;
+    `, [email])
+    return bps;
 }

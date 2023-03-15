@@ -25,8 +25,13 @@ export function retrieveHr(email: string): { hr: number; date: string } {
 export function retrieveAllHr(email: string): { hr: number; date: string }[] {
     const hrs = query<{ hr: number; date: string }>(`
         SELECT hr, date
-        FROM heartRate
-        WHERE userEmail = ?
+        FROM (
+            SELECT hr, date
+            FROM heartRate
+            WHERE userEmail = ?
+            ORDER BY date DESC
+            LIMIT 15
+        ) recent_heart_rates
         ORDER BY date ASC;
     `, [email])
     return hrs;
