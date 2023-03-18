@@ -22,6 +22,7 @@ import { sendInvitation } from './services/sendInvitation'
 import CreateAssignmentTab from './CreateAssignmentTab'
 import { sendAssignment } from './services/sendAssignment'
 import { removePatient } from './services/removePatient'
+import { deleteAssignment } from './services/deleteAssignment'
 
 type User = {
     name: string;
@@ -231,6 +232,19 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
         retrievePatients();
     }
 
+    let handleDeleteAssignment = async (assignmentId: string) => {
+        const response = await deleteAssignment(user?.email || "", user?.password || "", assignmentId)
+
+        if ('message' in response) {
+            console.log(response);
+            setErrorMessage(response.message);
+            return;
+        } else {
+            setSuccessMessage("Assignment deleted.");
+            retrieveAssignments();
+        }
+    }
+
     let handleReviewClick = (assignmentId: string, assignmentText: string, speech: { wpm: number, accuracy: number },
         patient: { name: string, email: string }) => {
         setAssignmentId(assignmentId);
@@ -281,13 +295,13 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
-                text={errorMessage} color="rgba(128, 128, 128, 0.95)" />
+                text={errorMessage} color="rgba(128, 128, 128, 1)" />
                 : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
-                    text={successMessage} color="rgba(50, 205, 50, 0.95)" />
+                    text={successMessage} color="rgba(50, 205, 50, 1)" />
                     : pageState === "home" && (warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
-                        text={warningMessage} color="rgba(255, 127, 80, 0.95)" />
+                        text={warningMessage} color="rgba(255, 127, 80, 1)" />
                         : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
-                            text={infoMessage} color="rgba(0, 128, 128, 0.95)" />
+                            text={infoMessage} color="rgba(0, 128, 128, 1)" />
                             : "")}
             {loggedIn ?
                 <div className="TherapistApp">
@@ -305,7 +319,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                                 onBackClick={() => setPageState("home")} onRemove={handleRemove} patients={patients} />
                                 : pageState === "assignments" ? <TherapistAssignmentsTab onReviewClick={handleReviewClick}
                                     onBackClick={() => setPageState("home")} onNewClick={() => setPageState("create")}
-                                    assignments={assignments} />
+                                    onDeleteClick={handleDeleteAssignment} assignments={assignments} />
                                     : pageState === "review" ? <ReviewTab onClick={handleFeedbackSubmit}
                                         onBackClick={() => setPageState("home")} assignmentId={assignmentId} assignmentText={assignmentText}
                                         speech={speech} userName={patient?.name} userEmail={patient?.email} />

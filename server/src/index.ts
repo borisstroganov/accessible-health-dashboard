@@ -1067,7 +1067,7 @@ app.delete("/deleteAssignment", isTherapist, (req, res) => {
 
     deleteAssignment(assignmentId);
     res.json({
-        message: "Assignment deleted.",
+        email: req.auth.email,
     } as types.DeleteAssignmentResponse)
 });
 

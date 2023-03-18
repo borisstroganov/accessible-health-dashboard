@@ -280,5 +280,5 @@ export type DeleteAssignmentRequest = {
 }
 
 export type DeleteAssignmentResponse = {
-    message: string,
+    email: string,
 }

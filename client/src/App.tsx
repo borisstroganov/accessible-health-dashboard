@@ -462,15 +462,15 @@ function App({ onBackClick }: AppProps) {
     return (
         <>
             {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
-                text={errorMessage} color="rgba(128, 128, 128, 0.95)" />
+                text={errorMessage} color="rgba(128, 128, 128, 1)" />
                 : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
-                    text={successMessage} color="rgba(50, 205, 50, 0.95)" />
+                    text={successMessage} color="rgba(50, 205, 50, 1)" />
                     : pageState === "home" && (warningMessage ? <Notification onClick={() => setWarningMessage("")} title="Warning"
-                        text={warningMessage} color="rgba(255, 127, 80, 0.95)" />
+                        text={warningMessage} color="rgba(255, 127, 80, 1)" />
                         : updateMessage ? <Notification onClick={() => setUpdateMessage("")} title="Update"
-                            text={updateMessage} color="rgba(207, 159, 255, 0.95)" />
+                            text={updateMessage} color="rgba(207, 159, 255, 1)" />
                             : infoMessage ? <Notification onClick={() => setInfoMessage("")} title="Information"
-                                text={infoMessage} color="rgba(0, 128, 128, 0.95)" />
+                                text={infoMessage} color="rgba(0, 128, 128, 1)" />
                                 : "")}
             {loggedIn ?
                 <div className="App">

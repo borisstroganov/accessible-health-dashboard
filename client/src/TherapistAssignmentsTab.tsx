@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import Modal from './Modal';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import './TherapistAssignmentsTab.css'
 
 type TherapistAssignmentsTabProps = {
     onReviewClick: (assignmentId: string, assignmentText: string, speech: { wpm: number, accuracy: number },
         patient: { name: string, email: string }) => void;
+    onDeleteClick: (assignmentId: string) => void;
     onBackClick: () => void;
     onNewClick: () => void;
     assignments: {
@@ -18,7 +20,7 @@ type TherapistAssignmentsTabProps = {
     }[],
 }
 
-function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assignments }: TherapistAssignmentsTabProps) {
+function TherapistAssignmentsTab({ onReviewClick, onDeleteClick, onBackClick, onNewClick, assignments }: TherapistAssignmentsTabProps) {
     const [tableVisibility, setTableVisibility] = useState<{ [key: string]: boolean }>({
         todo: false,
         completed: false,
@@ -34,6 +36,8 @@ function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assig
             setExpandedRows([...expandedRows, assignmentId]);
         }
     };
+    const [toggleModal, setToggleModal] = useState<boolean>(false);
+    const [deleteAssignmentId, setDeleteAssignmentId] = useState<string>("")
 
     const handleTableToggle = (table: string) => {
         setTableVisibility(prevVisibility => {
@@ -48,6 +52,11 @@ function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assig
             return newVisibility;
         });
     };
+
+    const handleDeleteClick = (assignmentId: string) => {
+        setDeleteAssignmentId(assignmentId);
+        setToggleModal(true);
+    }
 
     const todoRows: JSX.Element[] = [];
     const completedRows: JSX.Element[] = [];
@@ -65,6 +74,11 @@ function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assig
                         <button disabled={status !== "completed"} className="assignments-view-btn"
                             onClick={() => onReviewClick(assignmentId, assignmentText, speech,
                                 { name: userName, email: userEmail })}>Review</button>
+                        <button className="assignments-view-btn" style={{ color: "orangered" }}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteClick(assignmentId)
+                            }}>Delete</button>
                     </td>
                 </tr>
                 {expandedRows.includes(assignmentId) && (
@@ -105,6 +119,12 @@ function TherapistAssignmentsTab({ onReviewClick, onBackClick, onNewClick, assig
 
     return (
         <div className="assignments-tab">
+            {toggleModal && <Modal onClick={() => {
+                onDeleteClick(deleteAssignmentId)
+                setToggleModal(false)
+            }} onCancel={() => setToggleModal(false)}
+                headerText="Confirmation" bodyText={`Are you sure you want to delete the assignment?`}
+                buttonText="Delete" buttonTextColor="orangered" />}
             <h1>All Assignments</h1>
             <button className="home-button" onClick={onBackClick}>Home</button>
             <button className="create-assignment-button" onClick={onNewClick}><AiOutlinePlusCircle style={{
