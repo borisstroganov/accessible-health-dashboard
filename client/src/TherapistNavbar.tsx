@@ -1,3 +1,6 @@
+import { BsPeopleFill } from 'react-icons/bs'
+import { MdAccountCircle, MdLogout } from 'react-icons/md'
+
 type TherapistNavbarProps = {
     onClick: (state: string) => void;
     onLogOut: () => void;
@@ -22,16 +25,16 @@ function TherapistNavbar({ onClick, onLogOut, name }: TherapistNavbarProps) {
             </div>
             <ul>
                 <li>
-                    <a onClick={() => onClick("patients")}>Patients</a>
+                    <a onClick={() => onClick("patients")}>Patients &nbsp;<BsPeopleFill /></a>
                 </li>
                 <li>
                     <a onClick={() => onClick("assignments")}>Assignments</a>
                 </li>
                 <li>
-                    <a onClick={() => onClick("account")}>Account</a>
+                    <a onClick={() => onClick("account")}>Account &nbsp;<MdAccountCircle /></a>
                 </li>
                 <li>
-                    <a onClick={onLogOut}>Log Out</a>
+                    <a onClick={onLogOut}>Log Out &nbsp;<MdLogout /></a>
                 </li>
             </ul>
         </div>

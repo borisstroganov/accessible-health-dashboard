@@ -129,8 +129,36 @@ function App({ onBackClick }: AppProps) {
     }, [pageState]);
 
     useEffect(() => {
-        if (loggedIn && (!heartRate.hr || !bloodPressure.systolicPressure || !speechRate.wpm)) {
-            setInfoMessage("You haven't yet captured all the data, please capture the missing data.");
+        const checkDate = new Date();
+        checkDate.setDate(checkDate.getDate() - 2);
+
+        if (loggedIn) {
+            const missingReadings = [];
+            const notRecentlyCapturedReadings = [];
+
+            if (!heartRate.hr) {
+                missingReadings.push("Heart Rate");
+            } else if (new Date(heartRate.date) < checkDate) {
+                notRecentlyCapturedReadings.push("Heart Rate");
+            }
+            if (!bloodPressure.systolicPressure) {
+                missingReadings.push("Blood Pressure");
+            } else if (new Date(bloodPressure.date) < checkDate) {
+                notRecentlyCapturedReadings.push("Blood Pressure");
+            }
+            if (!speechRate.wpm) {
+                missingReadings.push("Speech Rate");
+            } else if (new Date(speechRate.date) < checkDate) {
+                notRecentlyCapturedReadings.push("Speech Rate");
+            }
+            let message = "";
+
+            if (missingReadings.length > 0) {
+                message = `You haven't yet captured your ${missingReadings.join(' and ')}, please capture it.`;
+            } else if (notRecentlyCapturedReadings.length > 0) {
+                message = `You haven't recently captured your ${notRecentlyCapturedReadings.join(' and ')}, consider capturing it soon.`;
+            }
+            setInfoMessage(message);
         } else {
             setInfoMessage("")
         }
