@@ -402,6 +402,58 @@ app.get("/retrieveSpeeches", isLoggedIn, (req: Request, res: Response) => {
     }
 });
 
+app.get("/therapistRetrieveSpeeches", isTherapist, (req: Request, res: Response) => {
+    const schema: JSONSchemaType<types.TherapistRetrieveSpeechesRequest> = {
+        type: "object",
+        properties: {
+            userEmail: { type: "string" },
+        },
+        required: ["userEmail"],
+        additionalProperties: false
+    }
+
+    const validate = ajv.compile(schema)
+    const valid = validate(req.query);
+    if (!valid) {
+        return res.status(400).json({
+            message: validate.errors?.map(err => err.message)
+        })
+    }
+
+    const { userEmail } = req.query as types.TherapistRetrieveSpeechesRequest;
+    console.log(userEmail)
+
+    if (getUserTherapistEmail(userEmail) != req.auth.email) {
+        return res.status(400).json({
+            message: "This user is not assigned to you."
+        })
+    } else {
+        const speech = retrieveAllSpeech(userEmail as string);
+        if (speech) {
+            res.json({
+                speeches: speech.map(item => ({
+                    speechCapture: {
+                        wpm: item.wpm,
+                        accuracy: item.accuracy,
+                        date: item.date,
+                    }
+                }))
+            } as types.TherapistRetrieveSpeechesResponse);
+        } else {
+            res.json({
+                speeches: [{
+                    speechCapture: {
+                        wpm: 0,
+                        accuracy: 0,
+                        date: "",
+                    }
+                }]
+            } as types.TherapistRetrieveSpeechesResponse);
+        }
+    }
+
+});
+
 app.post("/therapistSignup", (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.TherapistSignUpRequest> = {
         type: "object",

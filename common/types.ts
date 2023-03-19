@@ -97,6 +97,14 @@ export type RetrieveSpeechesResponse = {
     speeches: { speechCapture: { wpm: number, accuracy: number, date: string, } }[]
 }
 
+export type TherapistRetrieveSpeechesRequest = {
+    userEmail: string,
+}
+
+export type TherapistRetrieveSpeechesResponse = {
+    speeches: { speechCapture: { wpm: number, accuracy: number, date: string, } }[]
+}
+
 export type ChangePasswordRequest = {
     password: string,
     newPassword: string,

@@ -119,6 +119,7 @@ function App({ onBackClick }: AppProps) {
 
     useEffect(() => {
         if (pageState === "account" || pageState === "invitations") {
+            retrieveTherapist()
             retrieveInvitations();
         } else if (pageState === "assignments") {
             retrieveAssignments();

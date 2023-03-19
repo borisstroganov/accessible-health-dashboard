@@ -1,7 +1,7 @@
 import { ImDroplet } from 'react-icons/im'
 import { FaHeartbeat } from 'react-icons/fa'
 import { BsSoundwave } from 'react-icons/bs'
-import { MdAccountCircle, MdLogout } from 'react-icons/md'
+import { MdFormatListBulleted, MdAccountCircle, MdLogout } from 'react-icons/md'
 import './Navbar.css'
 
 type NavbarProps = {
@@ -28,16 +28,16 @@ function Navbar({ onClick, onLogOut, name }: NavbarProps) {
             </div>
             <ul>
                 <li>
-                    <a onClick={() => onClick("hr")}>HR <FaHeartbeat /></a>
+                    <a onClick={() => onClick("hr")}>HR &nbsp;<FaHeartbeat /></a>
                 </li>
                 <li>
-                    <a onClick={() => onClick("bp")}>BP <ImDroplet /></a>
+                    <a onClick={() => onClick("bp")}>BP &nbsp;<ImDroplet /></a>
                 </li>
                 <li>
-                    <a onClick={() => onClick("speech")}>Speech <BsSoundwave /></a>
+                    <a onClick={() => onClick("speech")}>Speech &nbsp;<BsSoundwave /></a>
                 </li>
                 <li>
-                    <a onClick={() => onClick("assignments")}>Assignments</a>
+                    <a onClick={() => onClick("assignments")}>Assignments &nbsp;<MdFormatListBulleted /></a>
                 </li>
                 <li>
                     <a onClick={() => onClick("account")}>Account &nbsp;<MdAccountCircle /></a>
