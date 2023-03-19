@@ -1,7 +1,8 @@
 import Database from "better-sqlite3";
 import fs from "fs";
+import path from "path";
 
-const db = new Database("./src/db/data.db", { verbose: console.log });
+const db = new Database(path.join(__dirname, "db", "data.db"), { verbose: console.log });
 db.pragma("foreign_keys = ON");
 
 export function query<T>(sql: string, params: Array<any>): Array<T> {
@@ -12,7 +13,7 @@ export function exec(sql: string, params: Array<any>): void {
 }
 
 export function createTables(): void {
-    const schema = fs.readFileSync("./src/db/schema.sql", {
+    const schema = fs.readFileSync(path.join(__dirname, "db", "schema.sql"), {
         encoding: 'utf8',
         flag: 'r',
     });
