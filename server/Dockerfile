@@ -10,7 +10,7 @@ RUN apk add --no-cache \
 WORKDIR /project
 COPY server ./server
 COPY common ./common
-RUN cd server && rm -rf node_modules && ls -lah && npm install
+RUN cd server && rm -rf node_modules && rm -rf src/db/data.db && ls -lah && npm install
 
 # Run
 ENTRYPOINT ["npx", "ts-node", "server/src/index.ts"]
