@@ -13,7 +13,21 @@
     width: 20vw;
     min-width: 280px;
     padding: 10px;
+    max-width: 400px;
+    flex-wrap: wrap;
 }
+
+.login-title {
+    font-size: 6vw;
+    font-weight: bold;
+    margin-bottom: 4rem;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .login-title {
+      font-size: 16vw;
+    }
+  }
 
 .login-input-container {
     display: flex;

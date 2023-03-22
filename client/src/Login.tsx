@@ -13,7 +13,7 @@ function Login({ onClick, onSignUpClick, role }: LoginProps) {
 
     return (
         <div className="Login">
-            <div className="landing-page-subtitle">{role === "patient"? "Login" : "Therapist Login"}</div>
+            <div className="login-title">{role === "patient"? "Login" : "Therapist Login"}</div>
             <div className="login-card">
                 <div className="login-input-container">
                     <div className="login-input">

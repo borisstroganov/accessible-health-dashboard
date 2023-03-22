@@ -12,6 +12,7 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
     const [passwordValue, setPasswordValue] = useState("");
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/;
     const lengthRegex = /^.{8,}$/;
+    const nameLengthRegex = /^.{5,}$/;
     const uppercaseRegex = /^(?=.*[A-Z])/;
     const lowercaseRegex = /^(?=.*[a-z])/;
     const numbersRegex = /^(?=.*\d)/;
@@ -30,6 +31,9 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
                     <div className="sign-up-input">
                         <label htmlFor="name">Name:</label>
                         <input type="text" name="name" value={nameValue} onChange={(e) => setNameValue(e.target.value)}></input>
+                        <div className="regex" style={{ "color": nameLengthRegex.test(nameValue) ? "limegreen" : "" }}>
+                            Must be at least 5 characters.
+                        </div>
                     </div>
                     <div className="sign-up-input">
                         <label htmlFor="password">Password:</label>

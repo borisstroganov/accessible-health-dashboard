@@ -8,13 +8,6 @@ type SpeechToTextProps = {
     text: string;
 }
 
-const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition
-const recognition = new SpeechRecognition();
-recognition.continuos = true;
-recognition.interimResults = true;
-recognition.lang = 'en-UK';
-
 function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
     const [isListening, setIsListening] = useState<boolean>(false);
     const [toggleModal, setToggleModal] = useState<boolean>(false);
@@ -24,9 +17,21 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
     var fullSpeech = ""
     var currentSpeech = ""
 
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+        console.log('Speech recognition is not supported by this browser');
+        return (<div>Speech Recognition is not supported by this browser.</div>)
+    }
+
     useEffect(() => {
         handleListen()
     }, [isListening])
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition();
+    recognition.continuos = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-UK';
 
     const handleListen = () => {
         !startTime ? setStartTime(performance.now()) : ""
