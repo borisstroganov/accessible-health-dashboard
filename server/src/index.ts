@@ -30,7 +30,7 @@ import * as types from "../../common/types";
 const ajv = new Ajv();
 addFormats(ajv, ["email", "password"]);
 
-const app = express();
+export const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -40,22 +40,22 @@ declare global {
             auth: { email: string }
         }
     }
-}
+};
 
-const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
+export const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     const result = bAuth(req);
     if (!result) {
         return res.status(401).json({
             message: "Authentication required."
         });
-    }
+    };
 
     const { name: email, pass } = result;
     if (!loginUser(email, pass) && !loginTherapist(email, pass)) {
         return res.status(403).json({
             message: "Invalid credentials."
         });
-    }
+    };
 
     req.auth = {
         email: email,
@@ -63,7 +63,7 @@ const isLoggedIn = (req: Request, res: Response, next: NextFunction) => {
     next();
 }
 
-const isTherapist = (req: Request, res: Response, next: NextFunction) => {
+export const isTherapist = (req: Request, res: Response, next: NextFunction) => {
     const result = bAuth(req);
     if (!result) {
         return res.status(401).json({
@@ -421,7 +421,6 @@ app.get("/therapistRetrieveSpeeches", isTherapist, (req: Request, res: Response)
     }
 
     const { userEmail } = req.query as types.TherapistRetrieveSpeechesRequest;
-    console.log(userEmail)
 
     if (getUserTherapistEmail(userEmail) != req.auth.email) {
         return res.status(400).json({
@@ -1124,4 +1123,8 @@ app.delete("/deleteAssignment", isTherapist, (req, res) => {
 });
 
 createTables();
-app.listen(5000);
+if (require.main === module) {
+    app.listen(5000, () => {
+        console.log('App has started');
+    });
+}
