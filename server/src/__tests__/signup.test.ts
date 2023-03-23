@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../index'
+import { app } from '../index';
 import * as UserModel from '../models/user';
 import * as TherapistModel from '../models/therapist';
 import * as types from '../../../common/types';
