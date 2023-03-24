@@ -9,7 +9,7 @@ export function createAssignment(userEmail: string, therapistEmail: string, assi
     `, [uuidv4(), userEmail, therapistEmail, assignmentTitle, assignmentText, "todo"]);
 }
 
-export function getUserAssignments(userEmail: string): { assignmentId: string }[] {
+export function getUserAssignments(userEmail: string): { assignmentId: string }[] | undefined {
     const userAssignmentIds = query<{ assignmentId: string; }>(`
         SELECT assignmentId
         FROM assignment
@@ -18,7 +18,7 @@ export function getUserAssignments(userEmail: string): { assignmentId: string }[
     return userAssignmentIds;
 }
 
-export function getTherapistAssignments(therapistEmail: string): { assignmentId: string }[] {
+export function getTherapistAssignments(therapistEmail: string): { assignmentId: string }[] | undefined {
     const therapistAssignmentIds = query<{ assignmentId: string; }>(`
         SELECT assignmentId
         FROM assignment
