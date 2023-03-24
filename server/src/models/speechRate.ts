@@ -11,7 +11,7 @@ export function captureSpeech(email: string, wpm: number, accuracy: number): str
     return currentDate;
 }
 
-export function retrieveSpeech(email: string): { speechId: string; wpm: number; accuracy: number; date: string } {
+export function retrieveSpeech(email: string): { speechId: string; wpm: number; accuracy: number; date: string } | undefined {
     const speeches = query<{ speechId: string; wpm: number; accuracy: number; date: string }>(`
         SELECT speechId, wpm, accuracy, date
         FROM speechRate
@@ -22,7 +22,7 @@ export function retrieveSpeech(email: string): { speechId: string; wpm: number; 
     return speeches[0];
 }
 
-export function retrieveSpeechById(speechId: string): { wpm: number; accuracy: number } {
+export function retrieveSpeechById(speechId: string): { wpm: number; accuracy: number } | undefined {
     const speech = query<{ wpm: number; accuracy: number }>(`
         SELECT wpm, accuracy
         FROM speechRate
@@ -31,7 +31,7 @@ export function retrieveSpeechById(speechId: string): { wpm: number; accuracy: n
     return speech[0];
 }
 
-export function retrieveAllSpeech(email: string): { wpm: number; accuracy: number; date: string }[] {
+export function retrieveAllSpeech(email: string): { wpm: number; accuracy: number; date: string }[] | undefined {
     const bps = query<{ wpm: number; accuracy: number; date: string }>(`
         SELECT wpm, accuracy, date
         FROM (

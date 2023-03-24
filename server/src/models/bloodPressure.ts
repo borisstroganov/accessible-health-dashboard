@@ -11,7 +11,7 @@ export function captureBp(email: string, systolicPressure: number, diastolicPres
     return currentDate;
 }
 
-export function retrieveBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string } {
+export function retrieveBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string } | undefined {
     const bps = query<{ systolicPressure: number; diastolicPressure: number; date: string }>(`
         SELECT systolicPressure, diastolicPressure, date
         FROM bloodPressure
@@ -22,7 +22,7 @@ export function retrieveBp(email: string): { systolicPressure: number; diastolic
     return bps[0];
 }
 
-export function retrieveAllBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string }[] {
+export function retrieveAllBp(email: string): { systolicPressure: number; diastolicPressure: number; date: string }[] | undefined {
     const bps = query<{ systolicPressure: number; diastolicPressure: number; date: string }>(`
         SELECT systolicPressure, diastolicPressure, date
         FROM (

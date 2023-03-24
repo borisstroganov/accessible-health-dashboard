@@ -896,7 +896,7 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
             const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
             const assignmentText = getAssignmentText(assignment.assignmentId);
             const status = getAssignmentStatus(assignment.assignmentId);
-            let speech: { wpm: number, accuracy: number } = { wpm: 0, accuracy: 0 };
+            let speech: { wpm: number, accuracy: number } | undefined = { wpm: 0, accuracy: 0 };
             if (status !== "todo") {
                 speech = retrieveSpeechById(getAssignmentSpeechId(assignment.assignmentId));
             }
@@ -945,7 +945,7 @@ app.get("/getTherapistAssignments", isTherapist, (req, res) => {
             const assignmentTitle = getAssignmentTitle(assignment.assignmentId);
             const assignmentText = getAssignmentText(assignment.assignmentId);
             const status = getAssignmentStatus(assignment.assignmentId);
-            let speech: { wpm: number, accuracy: number } = { wpm: 0, accuracy: 0 };
+            let speech: { wpm: number, accuracy: number } | undefined = { wpm: 0, accuracy: 0 };
             if (status !== "todo") {
                 speech = retrieveSpeechById(getAssignmentSpeechId(assignment.assignmentId));
             }
@@ -1027,7 +1027,9 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
 
     let date = captureSpeech(req.auth.email, wpm, accuracy);
     let speech = retrieveSpeech(req.auth.email);
-    setAssignmentSpeech(assignmentId, speech.speechId);
+    if (speech) {
+        setAssignmentSpeech(assignmentId, speech.speechId);
+    }
     res.json({
         email: req.auth.email,
         wpm: wpm,

@@ -11,7 +11,7 @@ export function captureHr(email: string, hr: number): string {
     return currentDate;
 }
 
-export function retrieveHr(email: string): { hr: number; date: string } {
+export function retrieveHr(email: string): { hr: number; date: string } | undefined {
     const hrs = query<{ hr: number; date: string }>(`
         SELECT hr, date
         FROM heartRate
@@ -22,7 +22,7 @@ export function retrieveHr(email: string): { hr: number; date: string } {
     return hrs[0];
 }
 
-export function retrieveAllHr(email: string): { hr: number; date: string }[] {
+export function retrieveAllHr(email: string): { hr: number; date: string }[] | undefined {
     const hrs = query<{ hr: number; date: string }>(`
         SELECT hr, date
         FROM (
