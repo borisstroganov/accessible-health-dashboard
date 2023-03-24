@@ -1,19 +1,20 @@
 import request from 'supertest';
 import { app } from '../index';
-import * as UserModel from '../models/user';
+import * as TherapistModel from '../models/therapist';
 import * as types from '../../../common/types';
 
 const auth = Buffer.from('test@test.com:oldPassword123').toString('base64');
 
-describe('POST /changePassword', () => {
-    const validRequest: types.ChangePasswordRequest = {
+
+describe('POST /therapistChangePassword', () => {
+    const validRequest: types.TherapistChangePasswordRequest = {
         password: 'oldPassword123',
         newPassword: 'Newpassword123',
         confirmPassword: 'Newpassword123',
     };
 
     it('should return 400 if the request body is invalid', async () => {
-        jest.spyOn(UserModel, 'loginUser').mockReturnValueOnce(true);
+        jest.spyOn(TherapistModel, 'loginTherapist').mockReturnValueOnce(true);
         const invalidRequestBody = {
             password: 'oldPassword123',
             newPassword: 'invalidPassword',
@@ -21,7 +22,7 @@ describe('POST /changePassword', () => {
         };
 
         const response = await request(app)
-            .post('/changePassword')
+            .post('/therapistChangePassword')
             .send(invalidRequestBody)
             .set('Authorization', `Basic ${auth}`);
 
@@ -31,7 +32,7 @@ describe('POST /changePassword', () => {
     });
 
     it('should return 400 if the old password is invalid', async () => {
-        jest.spyOn(UserModel, 'loginUser').mockReturnValueOnce(true);
+        jest.spyOn(TherapistModel, 'loginTherapist').mockReturnValueOnce(true);
         const requestWithWrongOldPassword = {
             password: 'oldPassword12',
             newPassword: 'Newpassword123',
@@ -39,7 +40,7 @@ describe('POST /changePassword', () => {
         };
 
         const response = await request(app)
-            .post('/changePassword')
+            .post('/therapistChangePassword')
             .send(requestWithWrongOldPassword)
             .set('Authorization', `Basic ${auth}`);
 
@@ -48,7 +49,7 @@ describe('POST /changePassword', () => {
     });
 
     it('should return 400 if the new passwords do not match', async () => {
-        jest.spyOn(UserModel, 'loginUser').mockReturnValue(true);
+        jest.spyOn(TherapistModel, 'loginTherapist').mockReturnValue(true);
         const requestWithMismatchedPasswords = {
             password: 'oldPassword123',
             newPassword: 'Newpassword123',
@@ -56,7 +57,7 @@ describe('POST /changePassword', () => {
         };
 
         const response = await request(app)
-            .post('/changePassword')
+            .post('/therapistChangePassword')
             .send(requestWithMismatchedPasswords)
             .set('Authorization', `Basic ${auth}`);
 
@@ -65,7 +66,7 @@ describe('POST /changePassword', () => {
     });
 
     it('should return 400 if the new password is the same as the old password', async () => {
-        jest.spyOn(UserModel, 'loginUser').mockReturnValue(true);
+        jest.spyOn(TherapistModel, 'loginTherapist').mockReturnValue(true);
         const requestWithSamePasswords = {
             password: 'oldPassword123',
             newPassword: 'oldPassword123',
@@ -73,7 +74,7 @@ describe('POST /changePassword', () => {
         };
 
         const response = await request(app)
-            .post('/changePassword')
+            .post('/therapistChangePassword')
             .send(requestWithSamePasswords)
             .set('Authorization', `Basic ${auth}`);
 
@@ -81,17 +82,17 @@ describe('POST /changePassword', () => {
         expect(response.body.message).toBe('New password cannot be the same as the old password.');
     });
 
-    it('should change the user password and return a 200 response', async () => {
-        const mockChangeUserPassword = jest.spyOn(UserModel, 'changeUserPassword').mockReturnValueOnce();
-        jest.spyOn(UserModel, 'loginUser').mockReturnValue(true);
+    it('should change the therapist password and return a 200 response', async () => {
+        const mockChangeTherapistPassword = jest.spyOn(TherapistModel, 'changeTherapistPassword').mockReturnValueOnce();
+        jest.spyOn(TherapistModel, 'loginTherapist').mockReturnValue(true);
 
         const response = await request(app)
-            .post('/changePassword')
+            .post('/therapistChangePassword')
             .send(validRequest)
             .set('Authorization', `Basic ${auth}`);
 
         expect(response.status).toBe(200);
         expect(response.body.email).toBeDefined();
-        expect(mockChangeUserPassword).toHaveBeenCalledTimes(1);
+        expect(mockChangeTherapistPassword).toHaveBeenCalledTimes(1);
     });
 });

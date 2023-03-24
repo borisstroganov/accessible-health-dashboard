@@ -591,7 +591,7 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
         return res.status(400).json({
             message: "Therapist with this email does not exist."
         })
-    } else if (getUserTherapistEmail(req.auth.email) !== null) {
+    } else if (getUserTherapistEmail(req.auth.email)) {
         return res.status(400).json({
             message: "Therapist already assigned."
         })
@@ -604,8 +604,8 @@ app.post("/addTherapist", isLoggedIn, (req: Request, res: Response) => {
     }
 });
 
-app.patch("/removeTherapist", isLoggedIn, (req, res) => {
-    if (getUserTherapistEmail(req.auth.email) === null) {
+app.patch("/removeTherapist", isLoggedIn, (req: Request, res) => {
+    if (!getUserTherapistEmail(req.auth.email)) {
         return res.status(400).json({
             message: "Therapist has not yet been assigned to this account."
         })
@@ -617,7 +617,7 @@ app.patch("/removeTherapist", isLoggedIn, (req, res) => {
     }
 });
 
-app.patch("/removePatient", isTherapist, (req, res) => {
+app.patch("/removePatient", isTherapist, (req: Request, res) => {
     const schema: JSONSchemaType<types.RemovePatientRequest> = {
         type: "object",
         properties: {
@@ -681,7 +681,16 @@ app.get("/getTherapistPatients", isTherapist, (req: Request, res: Response) => {
             { patients: patients } as types.GetTherapistPatientsResponse
         );
     } else {
-
+        res.json({
+            patients: [
+                {
+                    patient: {
+                        userEmail: "",
+                        userName: "",
+                    }
+                }
+            ]
+        } as types.GetTherapistPatientsResponse);
     }
 });
 
@@ -725,7 +734,7 @@ app.post("/sendInvitation", isTherapist, (req: Request, res: Response) => {
     }
 });
 
-app.get("/getUserInvitations", isLoggedIn, (req, res) => {
+app.get("/getUserInvitations", isLoggedIn, (req: Request, res: Response) => {
     const invitations = getUserInvitations(req.auth.email as string);
     if (invitations) {
         const therapists = invitations.map(therapist => {
@@ -748,7 +757,7 @@ app.get("/getUserInvitations", isLoggedIn, (req, res) => {
     }
 });
 
-app.get("/getTherapistInvitations", isTherapist, (req, res) => {
+app.get("/getTherapistInvitations", isTherapist, (req: Request, res: Response) => {
     const invitations = getTherapistInvitations(req.auth.email as string);
     if (invitations) {
         const users = invitations.map(user => {
@@ -771,7 +780,7 @@ app.get("/getTherapistInvitations", isTherapist, (req, res) => {
     }
 });
 
-app.post("/acceptInvitation", isLoggedIn, (req, res) => {
+app.post("/acceptInvitation", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.AcceptInvitationRequest> = {
         type: "object",
         properties: {
@@ -812,7 +821,7 @@ app.post("/acceptInvitation", isLoggedIn, (req, res) => {
     }
 });
 
-app.post("/rejectInvitation", isLoggedIn, (req, res) => {
+app.post("/rejectInvitation", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.RejectInvitationRequest> = {
         type: "object",
         properties: {
@@ -887,7 +896,7 @@ app.post("/sendAssignment", isTherapist, (req: Request, res: Response) => {
     }
 });
 
-app.get("/getUserAssignments", isLoggedIn, (req, res) => {
+app.get("/getUserAssignments", isLoggedIn, (req: Request, res: Response) => {
     const assignmentIds = getUserAssignments(req.auth.email as string);
     if (assignmentIds) {
         const assignments = assignmentIds.map(assignment => {
@@ -936,7 +945,7 @@ app.get("/getUserAssignments", isLoggedIn, (req, res) => {
     }
 });
 
-app.get("/getTherapistAssignments", isTherapist, (req, res) => {
+app.get("/getTherapistAssignments", isTherapist, (req: Request, res: Response) => {
     const assignmentIds = getTherapistAssignments(req.auth.email as string);
     if (assignmentIds) {
         const assignments = assignmentIds.map(assignment => {
@@ -985,7 +994,7 @@ app.get("/getTherapistAssignments", isTherapist, (req, res) => {
     }
 });
 
-app.post("/submitAssignment", isLoggedIn, (req, res) => {
+app.post("/submitAssignment", isLoggedIn, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.SubmitAssignmentRequest> = {
         type: "object",
         properties: {
@@ -1038,7 +1047,7 @@ app.post("/submitAssignment", isLoggedIn, (req, res) => {
     } as types.SubmitAssignmentResponse)
 });
 
-app.post("/reviewAssignment", isTherapist, (req, res) => {
+app.post("/reviewAssignment", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.ReviewAssignmentRequest> = {
         type: "object",
         properties: {
@@ -1088,7 +1097,7 @@ app.post("/reviewAssignment", isTherapist, (req, res) => {
     })
 });
 
-app.delete("/deleteAssignment", isTherapist, (req, res) => {
+app.delete("/deleteAssignment", isTherapist, (req: Request, res: Response) => {
     const schema: JSONSchemaType<types.DeleteAssignmentRequest> = {
         type: "object",
         properties: {

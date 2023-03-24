@@ -69,7 +69,7 @@ export function removeTherapist(email: string): void {
     `, [email]);
 }
 
-export function getUserTherapistEmail(email: string): string {
+export function getUserTherapistEmail(email: string): string | undefined {
     const user = query<User>(`
         SELECT therapistEmail
         FROM user
