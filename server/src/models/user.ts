@@ -79,8 +79,8 @@ export function getUserTherapistEmail(email: string): string | undefined {
     return user[0].therapistEmail;
 }
 
-export function getTherapistUsers(therapistEmail: string): {email: string}[] {
-    const users = query<{email: string}>(`
+export function getTherapistUsers(therapistEmail: string): { email: string }[] | undefined {
+    const users = query<{ email: string }>(`
         SELECT email
         FROM user
         WHERE therapistEmail = ?

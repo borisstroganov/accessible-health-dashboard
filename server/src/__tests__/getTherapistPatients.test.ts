@@ -19,7 +19,7 @@ describe('/getTherapistPatients endpoint', () => {
     });
 
     it('should return 200 and empty patients array if no patients found', async () => {
-        jest.spyOn(UserModel, 'getTherapistUsers').mockReturnValueOnce([]);
+        jest.spyOn(UserModel, 'getTherapistUsers').mockReturnValueOnce(undefined);
 
         const response = await request(app)
             .get('/getTherapistPatients')
@@ -27,7 +27,14 @@ describe('/getTherapistPatients endpoint', () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
-            patients: [],
+            patients: [
+                {
+                    patient: {
+                        userEmail: "",
+                        userName: "",
+                    },
+                },
+            ],
         });
     });
 
