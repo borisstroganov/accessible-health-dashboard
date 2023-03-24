@@ -721,7 +721,7 @@ app.post("/sendInvitation", isTherapist, (req: Request, res: Response) => {
         return res.status(400).json({
             message: "An invitation has already been sent to this patient."
         })
-    } else if (getUserTherapistEmail(userEmail) !== null) {
+    } else if (getUserTherapistEmail(userEmail)) {
         return res.status(400).json({
             message: "A therapist is already assigned to this patient."
         })
@@ -807,7 +807,7 @@ app.post("/acceptInvitation", isLoggedIn, (req: Request, res: Response) => {
         return res.status(400).json({
             message: "No invitation pending from this therapist."
         })
-    } else if (getUserTherapistEmail(req.auth.email) !== null) {
+    } else if (getUserTherapistEmail(req.auth.email)) {
         return res.status(400).json({
             message: "A therapist has already been assigned to this account."
         })

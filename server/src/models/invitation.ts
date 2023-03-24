@@ -7,7 +7,7 @@ export function createInvitation(userEmail: string, therapistEmail: string): voi
     `, [userEmail, therapistEmail]);
 }
 
-export function getUserInvitations(userEmail: string): { therapistEmail: string }[] {
+export function getUserInvitations(userEmail: string): { therapistEmail: string }[] | undefined {
     const userInvitations = query<{ therapistEmail: string; }>(`
         SELECT therapistEmail
         FROM invitation
@@ -16,7 +16,7 @@ export function getUserInvitations(userEmail: string): { therapistEmail: string 
     return userInvitations;
 }
 
-export function getTherapistInvitations(therapistEmail: string): { userEmail: string }[] {
+export function getTherapistInvitations(therapistEmail: string): { userEmail: string }[] | undefined {
     const therapistInvitations = query<{ userEmail: string; }>(`
         SELECT userEmail
         FROM invitation
