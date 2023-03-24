@@ -30,7 +30,7 @@ function PatientsTab({ onSubmit, onBackClick, onRemove, patients, onViewClick }:
         <tr key={userEmail}>
             <td>{userName}</td>
             <td>{userEmail}</td>
-            <td>WPM:{Math.round(speech.wpm)}, Accuracy:{Math.round(speech.accuracy)}</td>
+            <td>WPM:{speech ? Math.round(speech.wpm) : " --"}, Accuracy:{speech ? Math.round(speech.accuracy) : "--"}</td>
             <td>
                 <button className="invitation-accept-btn" onClick={() => onViewClick(userEmail, userName)}>View</button>
                 <button className="invitation-accept-btn" style={{ color: "orangered" }} onClick={() => {
