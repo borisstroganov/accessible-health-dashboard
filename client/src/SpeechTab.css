@@ -12,12 +12,26 @@
     align-items: center;
     justify-content: space-between;
     width: 600px;
-    height: 400px;
+    height: 22rem;
     padding: 10px;
     margin: 2px;
     border: 2px solid;
     border-radius: 20px;
     background-color: var(--section-bg-color);
+}
+
+.difficulty-buttons-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    right: 21%;
+}
+
+.difficulty-button {
+    width: 8rem;
+    margin: 0 5px;
 }
 
 .speech-wrapper {
