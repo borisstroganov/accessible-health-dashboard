@@ -61,7 +61,8 @@ function SignUp({ onClick, onBackClick }: SignUpProps) {
                         </div>
                     </div>
 
-                    <button className="sign-up-button" onClick={() => onClick(emailValue, nameValue, passwordValue)}>Register</button>
+                    <button className="sign-up-button" disabled={!emailValue || !nameValue || !passwordValue}
+                        onClick={() => onClick(emailValue, nameValue, passwordValue)}>Register</button>
                     <button className="sign-up-back-button" onClick={onBackClick}>Back</button>
                 </div>
             </div>
