@@ -23,7 +23,7 @@ type Difficulty = "easy" | "medium" | "hard";
 function SpeechTab({ onSubmit, onBackClick, assignmentText, assignmentId, previousCaptures }: SpeechTabProps) {
 
     const [text, setText] = useState(assignmentText || "After years of hard work, John finally achieved his dream of becoming a successful writer. He published his first book and it was a hit, leading to more opportunities and recognition.")
-    const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+    const [difficulty, setDifficulty] = useState<Difficulty>("medium");
     function generateSpeechPrompt(difficulty: Difficulty): void {
         if (difficulty === "easy") {
             const easyPrompts = [

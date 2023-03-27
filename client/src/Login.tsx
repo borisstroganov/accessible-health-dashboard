@@ -13,7 +13,7 @@ function Login({ onClick, onSignUpClick, role }: LoginProps) {
 
     return (
         <div className="Login">
-            <div className="login-title">{role === "patient"? "Login" : "Therapist Login"}</div>
+            <div className="login-title">{role === "patient" ? "Login" : "Therapist Login"}</div>
             <div className="login-card">
                 <div className="login-input-container">
                     <div className="login-input">
@@ -27,7 +27,9 @@ function Login({ onClick, onSignUpClick, role }: LoginProps) {
                     <button className="login-button" onClick={() => onClick(emailValue, passwordValue)}>Login</button>
                 </div>
                 <div className="login-sign-up">
-                    Don't have an account yet? <a href="#" className="" onClick={onSignUpClick}>Sign-Up</a>
+                    Don't have an account yet? <a onClick={onSignUpClick} style={{ fontWeight: "bold", textDecoration: "underline" }}>
+                        Sign-Up
+                    </a>
                 </div>
             </div>
         </div>

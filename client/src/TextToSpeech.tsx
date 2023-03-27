@@ -27,6 +27,9 @@ function TextToSpeech({ text }: TextToSpeechProps) {
             : window.speechSynthesis.speaking ? window.speechSynthesis.pause() : ""
         setResume(!resume);
     }
+    msg.onend = () => {
+        setPlaying(false);
+    };
 
     return (<div>
         <button className="tts-button" onClick={() => speech(msg)}>{playing ? <GiCancel /> : <GiSpeaker />}</button>
