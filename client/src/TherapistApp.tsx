@@ -336,8 +336,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
                             item.assignment.status === "todo").length} completedNumber={assignments.filter((item) =>
                                 item.assignment.status === "completed").length} />
                         : pageState === "account" ? <TherapistAccountTab onClick={handleChangePassword}
-                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""}
-                            onInvitationsClick={() => { setPageState("invitations") }} />
+                            onBackClick={() => setPageState("home")} email={user?.email || ""} name={user?.name || ""} />
                             : pageState === "patients" ? <PatientsTab onSubmit={handleSendInvitation} onViewClick={handleViewPatient}
                                 onBackClick={() => setPageState("home")} onRemove={handleRemove} patients={patients} />
                                 : pageState === "patient" ? <PatientTab onBackClick={() => setPageState("home")}

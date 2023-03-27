@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import './Login.css'
 
 type LoginProps = {
@@ -10,6 +11,7 @@ type LoginProps = {
 function Login({ onClick, onSignUpClick, role }: LoginProps) {
     const [emailValue, setEmailValue] = useState("");
     const [passwordValue, setPasswordValue] = useState("");
+    const [togglePasswordValue, setTogglePasswordValue] = useState<boolean>(true);
 
     return (
         <div className="Login">
@@ -22,7 +24,14 @@ function Login({ onClick, onSignUpClick, role }: LoginProps) {
                     </div>
                     <div className="login-input">
                         <label htmlFor="password">Password:</label>
-                        <input type="password" name="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)} />
+                        <div className="password-input">
+                            <input type={togglePasswordValue ? "password" : "text"} className="text-input" value={passwordValue}
+                                onChange={(e) => setPasswordValue(e.target.value)} />
+                            {togglePasswordValue ? <AiOutlineEye style={{ position: "absolute", right: "10px", top: "5px" }}
+                                onClick={() => setTogglePasswordValue(!togglePasswordValue)} />
+                                : <AiOutlineEyeInvisible style={{ position: "absolute", right: "10px", top: "5px" }}
+                                    onClick={() => setTogglePasswordValue(!togglePasswordValue)} />}
+                        </div>
                     </div>
                     <button className="login-button" onClick={() => onClick(emailValue, passwordValue)}>Login</button>
                 </div>

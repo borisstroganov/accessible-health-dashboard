@@ -18,14 +18,14 @@
 }
 
 .login-title {
-    font-size: 6vw;
+    font-size: 3rem;
     font-weight: bold;
     margin-bottom: 4rem;
   }
   
   @media screen and (max-width: 768px) {
     .login-title {
-      font-size: 16vw;
+      font-size: 3rem;
     }
   }
 

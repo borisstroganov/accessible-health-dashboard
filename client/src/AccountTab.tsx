@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Modal from './Modal'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import './AccountTab.css'
 
 type AccountTabProps = {
@@ -19,6 +20,9 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
     const [currentPassword, setCurrentPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
+    const [toggleCurrentPassword, setToggleCurrentPassword] = useState<boolean>(true)
+    const [toggleNewPassword, setToggleNewPassword] = useState<boolean>(true)
+    const [toggleConfirmPassword, setToggleConfirmPassword] = useState<boolean>(true)
     const lengthRegex = /^.{8,}$/;
     const uppercaseRegex = /^(?=.*[A-Z])/;
     const lowercaseRegex = /^(?=.*[a-z])/;
@@ -61,11 +65,23 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
                     <div className="account-password">
                         <div className="account-password-title">Change Password</div>
                         <div className="account-password-label">Current Password: </div>
-                        <input type="text" className="text-input" value={currentPassword} onChange={(e) =>
-                            setCurrentPassword(e.target.value)} />
+                        <div className="password-input">
+                            <input type={toggleCurrentPassword ? "password" : "text"} className="text-input" value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)} />
+                            {toggleCurrentPassword ? <AiOutlineEye style={{ position: "absolute", right: "10px", top: "5px" }}
+                                onClick={() => setToggleCurrentPassword(!toggleCurrentPassword)} />
+                                : <AiOutlineEyeInvisible style={{ position: "absolute", right: "10px", top: "5px" }}
+                                    onClick={() => setToggleCurrentPassword(!toggleCurrentPassword)} />}
+                        </div>
                         <div className="account-password-label">New Password: </div>
-                        <input type="text" className="text-input" value={newPassword} onChange={(e) =>
-                            setNewPassword(e.target.value)} />
+                        <div className="password-input">
+                            <input type={toggleNewPassword ? "password" : "text"} className="text-input" value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)} />
+                            {toggleCurrentPassword ? <AiOutlineEye style={{ position: "absolute", right: "10px", top: "5px" }}
+                                onClick={() => setToggleNewPassword(!toggleNewPassword)} />
+                                : <AiOutlineEyeInvisible style={{ position: "absolute", right: "10px", top: "5px" }}
+                                    onClick={() => setToggleNewPassword(!toggleNewPassword)} />}
+                        </div>
                         <div className="regex" style={{ "color": lengthRegex.test(newPassword) ? "limegreen" : "" }}>
                             Must be at least 8 characters.
                         </div>
@@ -79,8 +95,14 @@ function AccountTab({ onClick, onBackClick, onRemoveClick, onInvitationsClick, e
                             Must contain a number.
                         </div>
                         <div className="account-password-label">Confirm New Password: </div>
-                        <input type="text" className="text-input" value={confirmPassword} onChange={(e) =>
-                            setConfirmPassword(e.target.value)} />
+                        <div className="password-input">
+                            <input type={toggleConfirmPassword ? "password" : "text"} className="text-input" value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)} />
+                            {toggleConfirmPassword ? <AiOutlineEye style={{ position: "absolute", right: "10px", top: "5px" }}
+                                onClick={() => setToggleConfirmPassword(!toggleConfirmPassword)} />
+                                : <AiOutlineEyeInvisible style={{ position: "absolute", right: "10px", top: "5px" }}
+                                    onClick={() => setToggleConfirmPassword(!toggleConfirmPassword)} />}
+                        </div>
                         <div className="regex" style={{ "color": newPassword !== "" && newPassword == confirmPassword ? "limegreen" : "" }}>
                             Ensure the passwords match.
                         </div>

@@ -73,3 +73,11 @@
     position: relative;
     margin-top: 15px;
 }
+
+.password-input {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    position: relative;
+    width: 100%;
+}
