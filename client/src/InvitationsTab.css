@@ -30,7 +30,7 @@ table {
 .tbl-header.visible,
 .tbl-content.visible,
 .tbl-empty.visible {
-    max-height: 400px;
+    max-height: fit-content;
     transition: max-height 0.5s ease-in;
 }
 

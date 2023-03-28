@@ -47,7 +47,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
         assignmentTitle, assignmentText, status, speech, feedbackText } }) => {
         const row = (
             <>
-                <tr key={assignmentId} onClick={() => setExpandedRow(assignmentId)}>
+                <tr key={assignmentId} onClick={() => expandedRow === assignmentId ? setExpandedRow("") : setExpandedRow(assignmentId)}>
                     <td>{assignmentTitle}</td>
                     <td>{therapistName}</td>
                     <td>{therapistEmail}</td>

@@ -75,6 +75,11 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+button:disabled {
+  opacity: 0.6;
+  border-color: transparent;
+}
+
 input {
   color: var(--text-color);
   background-color: #333;
