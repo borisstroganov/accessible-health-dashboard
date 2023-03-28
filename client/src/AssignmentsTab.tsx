@@ -22,17 +22,10 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
         reviewed: false
     });
 
-    const [expandedRows, setExpandedRows] = useState<string[]>([]);
-
-    const handleRowClick = (assignmentId: string) => {
-        if (expandedRows.includes(assignmentId)) {
-            setExpandedRows(expandedRows.filter((id) => id !== assignmentId));
-        } else {
-            setExpandedRows([...expandedRows, assignmentId]);
-        }
-    };
+    const [expandedRow, setExpandedRow] = useState<string>("");
 
     const handleTableToggle = (table: string) => {
+        setExpandedRow("");
         setTableVisibility(prevVisibility => {
             const newVisibility = { ...prevVisibility };
             Object.keys(newVisibility).forEach(key => {
@@ -54,7 +47,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
         assignmentTitle, assignmentText, status, speech, feedbackText } }) => {
         const row = (
             <>
-                <tr key={assignmentId} onClick={() => handleRowClick(assignmentId)}>
+                <tr key={assignmentId} onClick={() => setExpandedRow(assignmentId)}>
                     <td>{assignmentTitle}</td>
                     <td>{therapistName}</td>
                     <td>{therapistEmail}</td>
@@ -63,7 +56,7 @@ function AssignmentsTab({ onAttemptClick, onBackClick, assignments }: Assignment
                             onClick={() => onAttemptClick(assignmentId, assignmentText)}>Attempt</button>
                     </td>
                 </tr>
-                {expandedRows.includes(assignmentId) && (
+                {expandedRow === assignmentId && (
                     <tr className="assignment-fold" key={assignmentId + "-fold"}>
                         <td colSpan={4}>
                             <div className="assignment-fold-content">
