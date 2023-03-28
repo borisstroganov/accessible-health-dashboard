@@ -106,7 +106,10 @@ function SpeechTab({ onSubmit, onBackClick, assignmentText, assignmentId, previo
                             {transcription}
                         </div>
                     </div>
-                    <SpeechToText onClick={setTranscription} onSubmit={handleSubmit} text={text} />
+                    {((!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)))
+                        ? <div>Speech Recognition is not supported by this browser.</div>
+                        : <SpeechToText onClick={setTranscription} onSubmit={handleSubmit} text={text} />}
+
                 </div>
             </div>
             {!assignmentText && <div className="difficulty-buttons-wrapper">
