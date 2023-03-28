@@ -16,15 +16,6 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
-  /* Light color scheme */
-  --primary-color: #00B2A9;
-  --primary-hover-color: #008C84;
-  --secondary-color: #7F7F7F;
-  --text-color: #000000;
-  --border-color: #E5E5E5;
-  --section-bg-color: #F5F5F5;
-  --background-color: #FFFFFF;
-
   /* Dark color scheme */
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -64,12 +55,13 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid white;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   background-color: var(--primary-hover-color);
+  color: var(--text-color);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -83,18 +75,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    border-color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #ffffff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
+input {
+  color: var(--text-color);
+  background-color: #333;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
