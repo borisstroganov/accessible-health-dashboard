@@ -63,7 +63,7 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
     const stopListen = () => {
         setIsListening(false);
         let elapsedTime = performance.now() - startTime;
-        setTime(elapsedTime / 1000 / 60);
+        setTime(time + (elapsedTime / 1000 / 60));
     }
 
     const checkAccuracy = () => {
