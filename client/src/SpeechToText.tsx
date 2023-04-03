@@ -11,9 +11,11 @@ type SpeechToTextProps = {
 const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition
 const recognition = SpeechRecognition ? new SpeechRecognition() : undefined;
-recognition.continuos = true;
-recognition.interimResults = true;
-recognition.lang = 'en-UK';
+if (recognition) {
+    recognition.continuos = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-UK';
+}
 
 function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
     const [isListening, setIsListening] = useState<boolean>(false);
