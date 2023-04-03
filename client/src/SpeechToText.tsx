@@ -10,7 +10,7 @@ type SpeechToTextProps = {
 
 const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition
-const recognition = new SpeechRecognition();
+const recognition = SpeechRecognition ? new SpeechRecognition() : undefined;
 recognition.continuos = true;
 recognition.interimResults = true;
 recognition.lang = 'en-UK';
@@ -25,9 +25,15 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
     var currentSpeech = ""
 
     useEffect(() => {
+        return () => {
+            recognition.stop()
+            recognition.onend = () => { }
+        };
+    }, []);
+
+    useEffect(() => {
         handleListen()
     }, [isListening])
-
 
     const handleListen = () => {
         !startTime ? setStartTime(performance.now()) : ""
