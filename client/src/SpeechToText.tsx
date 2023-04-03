@@ -66,6 +66,14 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
         setTime(time + (elapsedTime / 1000 / 60));
     }
 
+    const resetListen = () => {
+        setIsListening(false);
+        setStartTime(0);
+        setTime(0);
+        onClick("");
+        setSpeech("");
+    }
+
     const checkAccuracy = () => {
         const punctuation = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g;
 
@@ -96,6 +104,9 @@ function SpeechToText({ onClick, onSubmit, text }: SpeechToTextProps) {
                         Record
                     </button>
                 )}
+                <button className="stt-button" onClick={resetListen} disabled={!time}>
+                    Reset
+                </button>
                 <button className="stt-button" onClick={() => { setToggleModal(true) }} disabled={!time}>
                     Submit
                 </button>
