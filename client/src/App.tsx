@@ -273,6 +273,14 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setAssignments(response.assignments);
+            const todoAssignment = response.assignments.find((assignment) => {
+                return assignment.assignment.status === "todo";
+            });
+
+            if (todoAssignment) {
+                console.log(todoAssignment.assignment);
+                setInfoMessage("You have uncompleted assignments, please visit the assignments page.")
+            }
         }
     }
 
