@@ -101,6 +101,8 @@ function App({ onBackClick }: AppProps) {
     const [assignmentText, setAssignmentText] = useState<string>("")
     const [assignmentId, setAssignmentId] = useState<string>("")
 
+    const [assignmentMessageToggle, setAssignmentMessageToggle] = useState<boolean>(true)
+
     const [pageState, setPageState] = useState("home");
 
     useEffect(() => {
@@ -273,13 +275,17 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setAssignments(response.assignments);
-            const todoAssignment = response.assignments.find((assignment) => {
-                return assignment.assignment.status === "todo";
-            });
 
-            if (todoAssignment) {
-                console.log(todoAssignment.assignment);
-                setInfoMessage("You have uncompleted assignments, please visit the assignments page.")
+            if (assignmentMessageToggle) {
+                const todoAssignment = response.assignments.find((assignment) => {
+                    return assignment.assignment.status === "todo";
+                });
+
+                if (todoAssignment) {
+                    console.log(todoAssignment.assignment);
+                    setUpdateMessage("You have uncompleted assignments, please visit the assignments page to attempt them.");
+                    setAssignmentMessageToggle(false);
+                }
             }
         }
     }
@@ -367,6 +373,7 @@ function App({ onBackClick }: AppProps) {
         setInvitations([{ therapist: { therapistEmail: "", therapistName: "" } }]);
         resetMessages();
         onBackClick();
+        setAssignmentMessageToggle(true);
     }
 
     let handleHrSubmit = async (hr: number) => {
