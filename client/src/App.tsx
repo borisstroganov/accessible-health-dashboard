@@ -505,7 +505,7 @@ function App({ onBackClick }: AppProps) {
 
     return (
         <>
-            {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Invalid Input"
+            {errorMessage ? <Notification onClick={() => setErrorMessage("")} title="Error"
                 text={errorMessage} color="rgba(128, 128, 128, 1)" />
                 : successMessage ? <Notification onClick={() => setSuccessMessage("")} title="Success"
                     text={successMessage} color="rgba(50, 205, 50, 1)" />
