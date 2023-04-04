@@ -215,6 +215,7 @@ function TherapistApp({ onBackClick }: TherapistAppProps) {
             return;
         } else {
             setSuccessMessage("Password changed.");
+            setUser({ email: user?.email || "", name: user?.name || "", password: newPassword });
             setErrorMessage("");
         }
     }

@@ -346,6 +346,7 @@ function App({ onBackClick }: AppProps) {
             return;
         } else {
             setSuccessMessage("Password changed.");
+            setUser({ email: user?.email || "", name: user?.name || "", password: newPassword });
             setErrorMessage("");
         }
     }
